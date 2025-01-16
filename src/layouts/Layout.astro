@@ -1,3 +1,7 @@
+---
+import Index from "../components/Index.astro";
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
@@ -8,7 +12,9 @@
 		<title>Astro Basics</title>
 	</head>
 	<body>
-		<slot />
+    <main class="container mx-auto">
+      <slot/>
+    </main>
 	</body>
 </html>
 
