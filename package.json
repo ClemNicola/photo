@@ -1,0 +1,24 @@
+{
+  "name": "code-clemnicola-photo",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "decap": "bunx decap-server"
+  },
+  "dependencies": {
+    "astro": "^5.1.7",
+    "decap-cms-app": "^3.5.0",
+    "decap-server": "^3.1.2"
+  },
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
