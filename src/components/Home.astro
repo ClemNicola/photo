@@ -1,20 +1,23 @@
 ---
+import dayjs from "dayjs";
+
 let date = new Date();
+const format = dayjs(date).format('ddd, MMM DD, YYYY HH:mm A')
 ---
 <div class="h-screen flex flex-col justify-between">
-  <div class="flex gap-4 py-4 justify-end">
-    <a href="" class="text-orange font-custom font-bold">OVERVIEW</a>
-    <a href="" class="text-orange font-custom font-bold">THEME</a>
-    <a href="" class="text-orange font-custom font-bold">ABOUT</a>
+  <div class="flex gap-4 py-4 justify-end font-custom text-orange text-lg">
+    <a href="">Overview</a>
+    <a href="">Theme</a>
+    <a href="">About</a>
   </div>
   <div class="flex flex-col gap-2 items-center">
-    <div>
-      <p class="text-orange font-titleita italic text-9xl">Clément Nicolas</p>
-      <p  class="text-orange font-title text-5xl">Photographs</p>
+    <div class=" text-orange font-titleita">
+      <p class="text-9xl">Clément Nicolas</p>
+      <p  class="text-7xl">Photographs</p>
     </div>
   </div>
-  <div class="flex justify-between items-end py-4">
-    <p class="text-orange font-bold">{date}</p>
-    <p class="text-orange font-bold text-7xl">100</p>
+  <div class="flex justify-between items-end py-4 text-orange">
+    <p class="font-custom text-lg">{format}</p>
+    <p class="font-title text-7xl">100</p>
   </div>
 </div>

@@ -1,19 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: ClashGrotesk;
-  src: url('/public/fonts/ClashGrotesk.ttf') format('ttf');
+  src: url('/fonts/ClashGrotesk.ttf') format('truetype');
+  font-display: swap
 }
 
 @font-face {
-  font-family: Yarndings20;
-  src: url('/public/fonts/Yarndings20-Regular.ttf') format('ttf');
+  font-family: 'Yarndings20';
+  src: url('/fonts/Yarndings20-Regular.ttf') format('truetype');
+  font-display: swap
 }
 
 @font-face {
-  font-family: Harmond;
-  src: url('/public/fonts/Harmond-SemiBoldCondensed.otf') format('otf');
+  font-family: 'Harmond';
+  src: url('/fonts/Harmond-SemiBoldCondensed.otf') format('opentype');
+  font-display: swap
 }
 
 @font-face {
-  font-family: HarmondIta;
-  src: url('/public/fonts/Harmond-SemBdItaCond.otf') format('otf');
+  font-family: 'HarmondIta';
+  src: url('/fonts/Harmond-SemBdItaCond.otf') format('opentype');
+  font-display: swap
 }
