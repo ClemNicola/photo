@@ -9,7 +9,7 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
 ---
 <span
   id={id}
-  class:list={["scramble-text reveal", className]}
+  class:list={["animated-text", className]}
   data-original-text={text}
   data-delay={delay}
 >
@@ -17,63 +17,85 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
 </span>
 
 <script>
-   class ScrambleEffect {
+  import SplitType from "split-type"
+  import gsap from 'gsap'
+   class TextAnimator {
       private element: HTMLElement
       private originalText: string
       private letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       private interval: ReturnType<typeof setInterval> | null = null
+      private splitText: SplitType | null = null
+      private scramblesIntervals: number[] = []
 
       constructor(element: HTMLElement){
         this.element = element
         this.originalText = element.dataset.originalText || element.innerText
+        this.splitText = new SplitType(element, { types: 'chars' })
       }
 
-      start(duration = 3000){
-        let elapsedTime = 0
-        const intervalTime = 50
+      async animate(duration = 3000){
+        if (!this.splitText?.chars) return
+        const scrambleDuration = duration - 300
+        const fadeOut = 0.2
+        const fadeIn = 0.2
 
-        this.interval = setInterval(() => {
-          elapsedTime += intervalTime
-          this.element.innerText = this.originalText
-             .split("")
-             .map((letter, index) => {
-                if(elapsedTime >= duration) return this.originalText[index]
-                return this.letters[Math.floor(Math.random() * this.letters.length)]
-             })
-             .join("")
+        this.splitText.chars.forEach((char, index) => {
+          const intervalId = window.setInterval(() => {
+            char.textContent = this.letters[Math.floor(Math.random() * this.letters.length)]
+          }, 50)
+          this.scramblesIntervals.push(intervalId)
+        })
 
-             if(elapsedTime >= duration){
-               if(this.interval) clearInterval(this.interval)
-                this.element.textContent = this.originalText
-              }
-        }, intervalTime);
+        await new Promise((resolve) => setTimeout(resolve, scrambleDuration))
 
+        this.scramblesIntervals.forEach(interval => clearInterval(interval))
+
+        await gsap.to(this.splitText.chars, {
+          y: 0,
+          opacity: 1,
+          stagger: 0.03,
+          duration: fadeOut
+        })
+
+        this.splitText.chars.forEach((char, index) => {
+          char.textContent = this.originalText[index]
+        })
+
+        await gsap.to(this.splitText.chars, {
+          y: 0,
+          opacity: 1,
+          stagger: 0.03,
+          duration: fadeIn
+        })
+      }
+      cleanup() {
+        this.scramblesIntervals.forEach(interval => clearInterval(interval))
       }
    }
 
-   function initializeScrambleEffect() {
-      const elements = document.querySelectorAll('.scramble-text')
-      const scrambles = Array.from(elements).map((element) => {
+   function initializeAnimations() {
+      const elements = document.querySelectorAll('.animated-text')
+      const animators = Array.from(elements).map((element) => {
         if(element instanceof HTMLElement){
-          return new ScrambleEffect(element)
+          return new TextAnimator(element)
         }
       })
 
-      const startScramble = () => scrambles.forEach((scramble) => scramble?.start(3000))
+      const startAnim = () => animators.forEach((anim) => anim?.animate())
 
       let imagesLoaded = false;
       let timeoutReached = false;
 
       setTimeout(() => {
         timeoutReached = true
-        if(imagesLoaded) startScramble()
+        if(imagesLoaded) startAnim()
       }, 0);
 
       window.addEventListener('load', () => {
         imagesLoaded = true
-        if(timeoutReached) startScramble()
+        if(timeoutReached) startAnim()
       })
    }
 
-   document.addEventListener('DOMContentLoaded', initializeScrambleEffect)
+   document.addEventListener('DOMContentLoaded', initializeAnimations)
 </script>
