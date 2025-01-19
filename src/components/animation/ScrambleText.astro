@@ -1,0 +1,65 @@
+---
+export interface Props {
+  text: string
+  className?: string
+  delay?: number
+}
+const {text, className = "", delay = 0} = Astro.props
+const id = `scramble-${Math.random().toString(36).substring(2)}`
+---
+<span
+  id={id}
+  class:list={["scramble-text", className]}
+  data-original-text={text}
+  data-delay={delay}
+>
+  {text}
+</span>
+
+<script>
+   class ScrambleEffect {
+      private element: HTMLElement
+      private originalText: string
+      private letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      private interval: ReturnType<typeof setInterval> | null = null
+
+      constructor(element: HTMLElement){
+        this.element = element
+        this.originalText = element.dataset.originalText || element.innerText
+      }
+
+      start(delay = 0){
+        setTimeout(() => {
+          let iteration = 0
+          const maxIteration = 50
+
+          this.interval = setInterval(() => {
+            this.element.innerText = this.originalText
+             .split("")
+             .map((letter, index) => {
+                if(index < iteration){
+                  return this.originalText[index]
+                }
+                return this.letters[Math.floor(Math.random() * 26)]
+             })
+             .join("")
+             iteration += 1
+             if(iteration >= maxIteration){
+              if(this.interval) clearInterval(this.interval)
+              this.element.innerText = this.originalText
+             }
+          }, 50);
+        }, delay);
+      }
+   }
+   document.addEventListener('DOMContentLoaded', () => {
+    const elemetns = document.querySelectorAll('.scramble-text')
+    elemetns.forEach((element) => {
+      if(element instanceof HTMLElement){
+        const scramble = new ScrambleEffect(element)
+        const delay = Number(element.dataset.delay || 0)
+        scramble.start(delay)
+      }
+    })
+   })
+</script>
