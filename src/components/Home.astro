@@ -2,11 +2,13 @@
 import dayjs from "dayjs";
 import ScrambleText from "./animation/ScrambleText.astro";
 import CounterAnimation from "./animation/CounterAnimation.astro";
+import TextAppearance from "./animation/TextAppearance.astro";
 
 
 let date = new Date();
 const format = dayjs(date).format('ddd, MMM DD, YYYY HH:mm A')
 ---
+<TextAppearance/>
 <div class="h-screen flex flex-col justify-between">
   <div class="flex gap-4 py-4 justify-end font-custom text-orange text-lg">
     <a href=""><ScrambleText text="Overview" delay={0}/></a>
