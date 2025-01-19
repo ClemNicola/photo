@@ -1,0 +1,73 @@
+---
+  export interface Props {
+    maxCounter: number
+    seconds: number
+    className?: string
+    counter: number
+  }
+
+  const {maxCounter = 100, seconds = 3, counter = 0,  className = ""} = Astro.props
+  const id = `counter-${Math.random().toString(36).substring(2)}`
+---
+<span
+  id={id}
+  class:list={["counter-animation", className]}
+  data-max-counter={maxCounter}
+  data-seconds={seconds}
+>
+  {counter}
+</span>
+
+<script>
+  class CounterAnimation {
+    private element: HTMLElement
+    private maxCounter: number
+    private seconds: number
+    private counter: number = 0
+    private interval: ReturnType<typeof setInterval> | null = null
+
+    constructor(element: HTMLElement){
+      this.element = element
+      this.maxCounter = Number(element.dataset.maxCounter) || 100
+      this.seconds = Number(element.dataset.seconds) || 4
+      this.startCounter()
+    }
+
+    private startCounter(){
+        const intervalTime = (this.seconds * 1000) / this.maxCounter
+        this.interval = setInterval(() => {
+          this.counter++
+          this.element.textContent = this.counter.toString()
+
+          if(this.counter >= this.maxCounter) {
+            if(this.interval) clearInterval(this.interval)
+          }
+        }, (intervalTime));
+    }
+
+    public stop(){
+      if(this.interval){
+        clearInterval(this.interval)
+        this.element.textContent = this.maxCounter.toString()
+      }
+    }
+  }
+
+  function initializeCounter() {
+    const counterElements = document.querySelectorAll('.counter-animation')
+    const counters = Array.from(counterElements).map(element => {
+      if(element instanceof HTMLElement){
+        return new CounterAnimation(element)
+      }
+    })
+
+    setTimeout(() => {
+      counters.forEach(counter => counter?.stop());
+    }, 3000);
+
+    // window.addEventListener('load', () => {
+    //   counters.forEach((counter) => counter?.stop())
+    // })
+  }
+  document.addEventListener('DOMContentLoaded', initializeCounter)
+</script>
