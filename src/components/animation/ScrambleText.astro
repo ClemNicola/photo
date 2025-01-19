@@ -28,38 +28,52 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
         this.originalText = element.dataset.originalText || element.innerText
       }
 
-      start(delay = 0){
-        setTimeout(() => {
-          let iteration = 0
-          const maxIteration = 50
+      start(duration = 3000){
+        let elapsedTime = 0
+        const intervalTime = 50
 
-          this.interval = setInterval(() => {
-            this.element.innerText = this.originalText
+        this.interval = setInterval(() => {
+          elapsedTime += intervalTime
+          this.element.innerText = this.originalText
              .split("")
              .map((letter, index) => {
-                if(index < iteration){
-                  return this.originalText[index]
-                }
-                return this.letters[Math.floor(Math.random() * 26)]
+                if(elapsedTime >= duration) return this.originalText[index]
+                return this.letters[Math.floor(Math.random() * this.letters.length)]
              })
              .join("")
-             iteration += 1
-             if(iteration >= maxIteration){
-              if(this.interval) clearInterval(this.interval)
-              this.element.innerText = this.originalText
-             }
-          }, 50);
-        }, delay);
+
+             if(elapsedTime >= duration){
+               if(this.interval) clearInterval(this.interval)
+                this.element.textContent = this.originalText
+              }
+        }, intervalTime);
+
       }
    }
-   document.addEventListener('DOMContentLoaded', () => {
-    const elemetns = document.querySelectorAll('.scramble-text')
-    elemetns.forEach((element) => {
-      if(element instanceof HTMLElement){
-        const scramble = new ScrambleEffect(element)
-        const delay = Number(element.dataset.delay || 0)
-        scramble.start(delay)
-      }
-    })
-   })
+
+   function initializeScrambleEffect() {
+      const elements = document.querySelectorAll('.scramble-text')
+      const scrambles = Array.from(elements).map((element) => {
+        if(element instanceof HTMLElement){
+          return new ScrambleEffect(element)
+        }
+      })
+
+      const startScramble = () => scrambles.forEach((scramble) => scramble?.start(3000))
+
+      let imagesLoaded = false;
+      let timeoutReached = false;
+
+      setTimeout(() => {
+        timeoutReached = true
+        if(imagesLoaded) startScramble()
+      }, 0);
+
+      window.addEventListener('load', () => {
+        imagesLoaded = true
+        if(timeoutReached) startScramble()
+      })
+   }
+
+   document.addEventListener('DOMContentLoaded', initializeScrambleEffect)
 </script>
