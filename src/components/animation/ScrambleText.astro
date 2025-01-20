@@ -46,7 +46,6 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
       async animate(duration = 3000){
         if (!this.splitText?.chars) return
         const scrambleDuration = duration - 300
-        const animDuration = 0.5
 
         gsap.set(this.splitText.chars, {
         opacity: 1,
@@ -68,7 +67,6 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
         opacity: 0,
         y: '100%',
         stagger: 0.01,
-        duration: animDuration,
         ease: 'power2.in',
       })
 
@@ -86,9 +84,8 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
         opacity: 1,
         y: 0,
         stagger: 0.01,
-        duration: animDuration,
         ease: 'power2.out',
-        delay: 0.2,
+        delay: 0.5,
         onStart: () => {
           if(this.splitText?.chars){
             this.splitText.chars.forEach(char => {
