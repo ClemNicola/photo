@@ -17,37 +17,41 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
 </span>
 
 <style>
+
+  .animated-text {
+    display: inline-block;
+  }
   .char {
-    padding-right: 1vw
+    display: inline-block;
   }
 </style>
 
 <script>
-  import Splitting from 'splitting'
+  import SplitType from 'split-type'
   import gsap from 'gsap'
    class TextAnimator {
       private element: HTMLElement
       private originalText: string
       private letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       private interval: ReturnType<typeof setInterval> | null = null
-      private splitText: Splitting | null = null
+      private splitText: SplitType | null = null
       private scramblesIntervals: number[] = []
 
       constructor(element: HTMLElement){
         this.element = element
         this.originalText = element.dataset.originalText || element.innerText
-        this.splitText = Splitting({target: [element], by:'chars'})
+        this.splitText = new SplitType(element)
       }
 
       async animate(duration = 3000){
         if (!this.splitText?.chars) return
         const scrambleDuration = duration - 300
-        const animDuration = 0.3
+        const animDuration = 0.5
 
         gsap.set(this.splitText.chars, {
-          y: '0%',
-          clipPath: 'inset(0% 0 0 0)'
-        })
+        opacity: 1,
+        y: 0
+      })
 
         this.splitText.chars.forEach((char, index) => {
           const intervalId = window.setInterval(() => {
@@ -61,30 +65,45 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
         this.scramblesIntervals.forEach(interval => clearInterval(interval))
 
         await gsap.to(this.splitText.chars, {
-          y: '100%',
-          clipPath: 'inset(0% 0 100% 0)',
-          stagger: 0.02,
-          duration: animDuration,
-          ease: 'power2.in'
-        })
+        opacity: 0,
+        y: '100%',
+        stagger: 0.01,
+        duration: animDuration,
+        ease: 'power2.in',
+      })
 
         this.splitText.chars.forEach((char, index) => {
           char.textContent = this.originalText[index]
         })
 
         gsap.set(this.splitText.chars, {
-          y: '-100%',
-          clipPath: 'inset(100% 0 0% 0)'
-        })
+        opacity: 0,
+        y: '100%'
+      })
 
-        await gsap.to(this.splitText.chars, {
-          y: '0%',
-          clipPath: 'inset(0% 0 0% 0)',
-          stagger: 0.02,
-          duration: animDuration,
-          ease: 'power2.out'
-        })
-      }
+
+      await gsap.to(this.splitText.chars, {
+        opacity: 1,
+        y: 0,
+        stagger: 0.01,
+        duration: animDuration,
+        ease: 'power2.out',
+        delay: 0.2,
+        onStart: () => {
+          if(this.splitText?.chars){
+            this.splitText.chars.forEach(char => {
+              char.classList.remove('font-loading')
+
+              if(char.closest('.special')){
+                char.classList.add('font-titleita')
+              }else{
+                char.classList.add('font-custom')
+              }
+            })
+          }
+        }
+      })
+    }
       cleanup() {
         this.scramblesIntervals.forEach(interval => clearInterval(interval))
       }
