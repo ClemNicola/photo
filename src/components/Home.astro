@@ -15,7 +15,10 @@ const format = dayjs(date).format('ddd, MMM DD, YYYY HH:mm A')
     </div>
     <div class="flex flex-col gap-2 items-center">
       <div class=" flex flex-col text-orange font-titleita">
-        <ScrambleText text="Clément Nicolas" delay={0} className="text-9xl"/>
+        <div class="flex gap-8">
+          <ScrambleText text="Clément" delay={0} className="text-9xl"/>
+          <ScrambleText text="Nicolas" delay={0} className="text-9xl"/>
+        </div>
         <ScrambleText text="Photographs" delay={0} className="text-7xl"/>
       </div>
     </div>

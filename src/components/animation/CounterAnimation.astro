@@ -6,7 +6,7 @@
     counter: number
   }
 
-  const {maxCounter = 100, seconds = 3, counter = 0,  className = ""} = Astro.props
+  const {maxCounter = 100, seconds = 2.7, counter = 0,  className = ""} = Astro.props
   const id = `counter-${Math.random().toString(36).substring(2)}`
 ---
 <span
@@ -63,7 +63,7 @@
 
     setTimeout(() => {
       counters.forEach(counter => counter?.stop());
-    }, 3000);
+    }, 2700);
 
     // window.addEventListener('load', () => {
     //   counters.forEach((counter) => counter?.stop())
