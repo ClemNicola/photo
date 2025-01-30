@@ -1,0 +1,38 @@
+backend:
+  name: github
+  repo: ClemNicola/photo
+  branch: main
+
+local_backend: true
+
+media_folder: "public/images"
+public_folder: "/images"
+
+collections:
+  - name: "categories"
+    label: "Catégories"
+    folder: "src/content/categories"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Category", name: "category", widget: "strinng"}
+  - name: "my_photos"
+    label: "Photos"
+    folder: "src/content/photos"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "ID", name: "id", widget: "string"}
+      - {label: "Titre", name: "title", widget: "string"}
+      - {label: "Date", name: "date", widget: "datetime"}
+      - {label: "Image", name: "image", widget: "image"}
+      - {
+          label: "Catégorie",
+          name: "category",
+          widget: "relation",
+          collection: "categories",
+          search_fields: ["name"],
+          value_field: "name",
+          display_fields: ["name"]
+        }
+      - {label: "Lieu", name: "place", widget: "string"}
