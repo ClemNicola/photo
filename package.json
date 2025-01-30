@@ -13,8 +13,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@astrojs/tailwind": "^5.1.4",
-    "astro": "^5.1.7",
+    "@astrojs/tailwind": "6.0.0",
+    "astro": "5.2.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "decap-cms-app": "^3.5.0",
