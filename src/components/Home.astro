@@ -1,0 +1,41 @@
+---
+import dayjs from "dayjs";
+import ScrambleText from "./animation/ScrambleText.astro";
+import CounterAnimation from "./animation/CounterAnimation.astro";
+
+
+let date = new Date();
+const day = dayjs(date).format('ddd,')
+const month = dayjs(date).format('MMM')
+const num = dayjs(date).format('DD,')
+const year = dayjs(date).format('YYYY')
+const hours = dayjs(date).format('HH:mm')
+const am = dayjs(date).format('A')
+---
+  <div class="h-screen flex flex-col justify-between">
+    <div class="flex gap-4 py-4 justify-end font-loading text-orange text-lg">
+      <a href=""><ScrambleText text="Overview" delay={0}/></a>
+      <a href=""><ScrambleText text="Theme" delay={0}/></a>
+      <a href=""><ScrambleText text="About" delay={0}/></a>
+    </div>
+    <div class="flex flex-col gap-2 items-center">
+      <div class=" flex flex-col text-orange font-loading special">
+        <div class="flex gap-8">
+          <ScrambleText text="Clément" delay={0} className="text-9xl"/>
+          <ScrambleText text="Nicolas" delay={0} className="text-9xl"/>
+        </div>
+        <ScrambleText text="Photographs" delay={0} className="text-7xl"/>
+      </div>
+    </div>
+    <div class="flex justify-between items-end py-4 text-orange">
+      <div class="flex gap-1">
+        <ScrambleText text=`${day}` delay={0} className="font-loading text-lg"/>
+        <ScrambleText text=`${month}` delay={0} className="font-loading text-lg"/>
+        <ScrambleText text=`${num}` delay={0} className="font-loading text-lg"/>
+        <ScrambleText text=`${year}` delay={0} className="font-loading text-lg"/>
+        <ScrambleText text=`${hours}` delay={0} className="font-loading text-lg"/>
+        <ScrambleText text=`${am}` delay={0} className="font-loading text-lg"/>
+      </div>
+      <CounterAnimation counter={0} maxCounter={100} seconds={2.7} className="font-title text-7xl"/>
+    </div>
+  </div>
