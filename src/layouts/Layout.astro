@@ -1,3 +1,6 @@
+---
+import '../styles/global.css'
+---
 <!doctype html>
 <html lang="en">
 	<head>
@@ -7,8 +10,10 @@
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
 	</head>
-	<body>
-		<slot />
+	<body class="bg-creme overflow-hidden">
+    <main class="container mx-auto">
+      <slot/>
+    </main>
 	</body>
 </html>
 

@@ -7,6 +7,10 @@ import tailwind from '@astrojs/tailwind';
 export default defineConfig({
   redirects:
     { '/admin/' : '/admin/index.html' },
-
+  vite:{
+    optimizeDeps:{
+      include:['gsap', 'split-type']
+    }
+  },
   integrations: [tailwind()]
 });
