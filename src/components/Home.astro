@@ -2,6 +2,7 @@
 import dayjs from "dayjs";
 import ScrambleText from "./animation/ScrambleText.astro";
 import CounterAnimation from "./animation/CounterAnimation.astro";
+import PhotoCard from "./PhotoCard.astro";
 
 
 let date = new Date();
@@ -12,6 +13,7 @@ const year = dayjs(date).format('YYYY')
 const hours = dayjs(date).format('HH:mm')
 const am = dayjs(date).format('A')
 ---
+<>
   <div class="h-screen flex flex-col justify-between">
     <div class="flex gap-4 py-4 justify-end font-loading text-orange text-lg">
       <a href=""><ScrambleText text="Overview" delay={0}/></a>
@@ -39,3 +41,7 @@ const am = dayjs(date).format('A')
       <CounterAnimation counter={0} maxCounter={100} seconds={2.7} className="font-title text-7xl"/>
     </div>
   </div>
+  <section class="bg-brown py-12">
+    <PhotoCard></PhotoCard>
+  </section>
+</>
