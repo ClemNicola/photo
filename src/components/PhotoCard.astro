@@ -8,12 +8,13 @@ import { getCollection, type CollectionEntry } from 'astro:content'
   const { category } = Astro.props
 
   const photos: CollectionEntry<'photos'>[] = await getCollection('photos', (photo: CollectionEntry<'photos'>) =>
-    photo.data.category === category
+    photo.data.category === category && photo.data.id === '1'
   )
 ---
 
 <div>
   {photos.map((photo) => (
+
     <div class="flex justify-center">
       <div class="flex flex-col py-4">
         <h2 class="font-custom font-semi-bold py-4 text-4xl text-custom-black">
@@ -29,5 +30,6 @@ import { getCollection, type CollectionEntry } from 'astro:content'
         </div>
       </div>
     </div>
+
   ))}
 </div>
