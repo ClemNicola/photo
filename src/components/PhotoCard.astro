@@ -1,3 +1,23 @@
-<div>
+---
+import { getCollection, type CollectionEntry } from 'astro:content'
 
+  export interface Props {
+    category: string
+  }
+  const { category } = Astro.props
+
+  const photos: CollectionEntry<'photos'>[] = await getCollection('photos', (photo: CollectionEntry<'photos'>) =>
+    photo.data.category === category
+  )
+---
+
+<div>
+  {photos.map((photo) => (
+    <div class="flex flex-col">
+      <h2>
+        {photo.data.title}
+      </h2>
+      <img src={photo.data.image} alt={photo.data.title}/>
+    </div>
+  ))}
 </div>
