@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets'
 import { getCollection, type CollectionEntry } from 'astro:content'
+import { ArrowRight } from 'lucide-react'
 
   export interface Props {
     category: string
@@ -14,22 +15,21 @@ import { getCollection, type CollectionEntry } from 'astro:content'
 
 <div>
   {photos.map((photo) => (
-
     <div class="flex justify-center">
       <div class="flex flex-col py-4">
         <h2 class="font-custom font-semi-bold py-4 text-4xl text-custom-black">
           {photo.data.category}
         </h2>
         <div class="flex gap-8 items-end">
-          <Image src={photo.data.image} alt={photo.data.title} width='900' height='1250' class='object-cover'/>
-          <div class="border-t-2 ">
-            <h3 class="font-custom text-xl">
+          <Image src={photo.data.image} alt={photo.data.title} width='700' height='1400' class='object-cover'/>
+          <div class="border-t-2 flex justify-between ">
+            <h3 class="font-custom text-2xl">
               See more
             </h3>
+            <ArrowRight size={24}/>
           </div>
         </div>
       </div>
     </div>
-
   ))}
 </div>
