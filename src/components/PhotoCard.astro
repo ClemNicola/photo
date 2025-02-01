@@ -12,27 +12,22 @@ import {Icon} from 'astro-icon/components'
     photo.data.category === category && photo.data.id === '1'
   )
 ---
-
-<div>
   {photos.map((photo) => (
-    <div class="flex justify-center">
-      <div class="flex flex-col py-4">
-        <h2 class="font-custom font-semi-bold py-4 text-4xl text-custom-black">
-          {photo.data.category}
-        </h2>
-        <div class="flex gap-8 items-end">
-          <Image src={photo.data.image} alt={photo.data.title} width='700' height='1400' class='object-cover'/>
-          <div class="border-t-2">
-            <div class="pt-2 flex justify-between items-center gap-12">
-              <h3 class="font-custom text-2xl">
-                See more
-                {/* rendre dynamique */}
-              </h3>
-              <Icon name="lucide:arrow-right" class="text-2xl"/>
-            </div>
+    <div class="flex flex-col py-4">
+      <h2 class="font-custom font-semi-bold py-4 text-4xl text-custom-black">
+        {photo.data.category}
+      </h2>
+      <div class="flex gap-4 items-end">
+        <Image src={photo.data.image} alt={photo.data.title} width='700' height='1400' class='object-cover'/>
+        <div class="border-t-2">
+          <div class="pt-2 flex justify-between items-center gap-12">
+            <h3 class="font-custom text-2xl">
+              See more
+              {/* rendre dynamique */}
+            </h3>
+            <Icon name="lucide:arrow-right" class="text-2xl"/>
           </div>
         </div>
       </div>
     </div>
   ))}
-</div>
