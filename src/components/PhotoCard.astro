@@ -18,7 +18,7 @@ import {Icon} from 'astro-icon/components'
         {photo.data.category}
       </h2>
       <div class="flex gap-4 items-end">
-        <Image src={photo.data.image} alt={photo.data.title} width='700' height='1400' class='object-cover'/>
+        <Image src={photo.data.image} alt={photo.data.title} width='700' height='1400' class='object-cover shader-image'/>
         <div class="border-t-2">
           <div class="pt-2 flex justify-between items-center gap-12">
             <h3 class="font-custom text-2xl">
@@ -31,3 +31,22 @@ import {Icon} from 'astro-icon/components'
       </div>
     </div>
   ))}
+
+  <script>
+    import { PixelShader } from "./animation/PixelShader";
+    document.addEventListener('DOMContentLoaded', () => {
+      const images = document.querySelectorAll('.shader-image')
+      images.forEach(img => {
+        const shaderEffect = new PixelShader(img)
+        img.parentElement?.addEventListener('mouseenter', () => {
+          shaderEffect.isHovered = true,
+          shaderEffect.start()
+        })
+
+        img.parentElement?.addEventListener('mouseleave', () => {
+          shaderEffect.isHovered = false;
+          shaderEffect.stop();
+        });
+    })
+  })
+  </script>
