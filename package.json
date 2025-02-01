@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@astrojs/tailwind": "6.0.0",
+    "@iconify-json/lucide": "^1.2.25",
     "@iconify/json": "^2.2.301",
     "astro": "5.2.1",
     "astro-icon": "^1.1.5",
