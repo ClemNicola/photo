@@ -7,10 +7,10 @@ export class PixelShader {
     this.image = imageElement
     this.scene = new THREE.Scene()
     this.camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1)
+    this.lastMousePosition = new THREE.Vector2(0.5, 0.5)
 
     this.renderer = new THREE.WebGLRenderer({
       alpha: true,
-
     })
     this.renderer.setSize(this.image.offsetWidth, this.image.offsetHeight)
 
@@ -25,8 +25,10 @@ export class PixelShader {
       uniforms: {
         uTexture: {value: texture},
         time: {value: 0.1},
-        pixelSize: {value: 80},
-        uMouse: { value: new THREE.Vector2(0.5, 0.5) }
+        pixelSize: {value: 35},
+        uMouse: { value: new THREE.Vector2(0.5, 0.5)},
+        uStrength: { value: 0.0},
+        uFadeStrength: { value: 1.0 },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -40,24 +42,26 @@ export class PixelShader {
         uniform float time;
         uniform float pixelSize;
         uniform vec2 uMouse;
+        uniform float uStrength;
+        uniform float uFadeStrength;
         varying vec2 vUv;
 
         void main() {
           float d = distance(vUv, uMouse);
-          float radius = 0.3;
-          float influence = smoothstep(radius, 0.0, d);
+          float radius = 0.02;
+          float influence = smoothstep(radius, 0.9 , d);
+          influence = (1.0 - influence) * uFadeStrength;
           vec2 dir = normalize(vUv - uMouse);
-          float offset = sin(time * 3.0 + d * 30.0) * 0.01;
-          vec2 displacedUV = vUv + dir * offset * influence;
-          vec2 pixelatedCoord = floor(displacedUV * pixelSize) / pixelSize;
-          vec2 fluidPixelUV = mix(displacedUV, pixelatedCoord, influence);
-          // float oscillation = sin(time * 5.0 + d * 50.0) * 0.005;
-          // vec2 fluidUV = vUv + dir * oscillation * (1.0 - smoothstep(0.0, radius, d));
-          // vec2 pixelatedUV = floor(fluidUV * pixelSize) / pixelSize;
-          vec4 pixelatedColor = texture2D(uTexture, fluidPixelUV);
+          vec2 pixelatedUV = vUv;
+          if (influence > 0.0) {
+            float pixelSizeScaled = pixelSize * (1.5 + uStrength * 2.0);
+            pixelatedUV = floor(vUv * pixelSizeScaled) / pixelSizeScaled;
+            float distortionStrength = sin(time * 1.5 + d * 20.0) * 0.007 * uStrength;
+            pixelatedUV += dir * distortionStrength * influence;
+          };
+          vec4 pixelatedColor = texture2D(uTexture, pixelatedUV);
           vec4 originalColor = texture2D(uTexture, vUv);
-          // float factor = 1.0 - smoothstep(0.0, radius, d);
-          gl_FragColor = mix(originalColor, pixelatedColor, influence);
+          gl_FragColor = mix(originalColor, pixelatedColor, uStrength * influence);
         }
       `
     });
@@ -78,6 +82,16 @@ export class PixelShader {
     this.container.style.position = 'relative';
     this.container.appendChild(this.renderer.domElement);
     this.container.addEventListener('mousemove', this.onMouseMove.bind(this));
+    this.container.addEventListener('mouseenter', () =>
+      {
+         this.isHovered = true;
+         this.material.uniforms.uFadeStrength.value = 1.0;
+      });
+    this.container.addEventListener('mouseleave', () =>
+      {
+        this.isHovered = false;
+        this.lastMousePosition.copy(this.material.uniforms.uMouse.value);
+      });
   }
 
   onMouseMove(e){
@@ -85,6 +99,8 @@ export class PixelShader {
     const x = (e.clientX - rect.left) / rect.width;
     const y = 1.0 - (e.clientY - rect.top) / rect.height;
     this.material.uniforms.uMouse.value.set(x, y);
+    this.material.uniforms.uStrength.value = 1.0;
+    this.lastMousePosition.set(x, y);
   }
 
   animate(time){
