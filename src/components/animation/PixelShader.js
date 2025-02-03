@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { createLanguageService } from 'typescript'
 
 export class PixelShader {
   constructor(imageElement){
@@ -80,6 +79,16 @@ export class PixelShader {
     this.renderer.domElement.style.left = '0';
 
     this.container.style.position = 'relative';
+    this.container.style.padding = '40px';
+    this.container.style.margin = '-40px';
+
+    this.image.style.position = 'relative';
+    this.image.style.zIndex = '1';
+
+    this.renderer.domElement.style.position = 'absolute';
+    this.renderer.domElement.style.top = '40px';
+    this.renderer.domElement.style.left = '40px';
+
     this.container.appendChild(this.renderer.domElement);
     this.container.addEventListener('mousemove', this.onMouseMove.bind(this));
     this.container.addEventListener('mouseenter', () =>
@@ -96,11 +105,14 @@ export class PixelShader {
 
   onMouseMove(e){
     const rect = this.container.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = 1.0 - (e.clientY - rect.top) / rect.height;
-    this.material.uniforms.uMouse.value.set(x, y);
+    const padding = 40;
+    const x = (e.clientX - (rect.left + padding)) / (rect.width - padding * 2);
+    const y = 1.0 - (e.clientY -(rect.top + padding)) / (rect.height - padding * 2);
+    const clampedX = Math.max(0, Math.min(1, x));
+    const clampedY = Math.max(0, Math.min(1, y));
+    this.material.uniforms.uMouse.value.set(clampedX, clampedY);
     this.material.uniforms.uStrength.value = 1.0;
-    this.lastMousePosition.set(x, y);
+    this.lastMousePosition.set(clampedX, clampedY);
   }
 
   animate(time){
