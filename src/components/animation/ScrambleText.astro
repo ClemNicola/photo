@@ -1,15 +1,16 @@
 ---
 export interface Props {
-  text: string
-  className?: string
-  delay?: number
+  text: string;
+  className?: string;
+  delay?: number;
 }
-const {text, className = "", delay = 0} = Astro.props
-const id = `scramble-${Math.random().toString(36).substring(2)}`
+const { text, className = '', delay = 0 } = Astro.props;
+const id = `scramble-${Math.random().toString(36).substring(2)}`;
 ---
+
 <span
   id={id}
-  class:list={["animated-text", className]}
+  class:list={['animated-text', className]}
   data-original-text={text}
   data-delay={delay}
 >
@@ -17,7 +18,6 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
 </span>
 
 <style>
-
   .animated-text {
     display: inline-block;
   }
@@ -27,58 +27,57 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
 </style>
 
 <script>
-  import SplitType from 'split-type'
-  import gsap from 'gsap'
-   class TextAnimator {
-      private element: HTMLElement
-      private originalText: string
-      private letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      private interval: ReturnType<typeof setInterval> | null = null
-      private splitText: SplitType | null = null
-      private scramblesIntervals: number[] = []
+  import SplitType from 'split-type';
+  import gsap from 'gsap';
+  class TextAnimator {
+    private element: HTMLElement;
+    private originalText: string;
+    private letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    private interval: ReturnType<typeof setInterval> | null = null;
+    private splitText: SplitType | null = null;
+    private scramblesIntervals: number[] = [];
 
-      constructor(element: HTMLElement){
-        this.element = element
-        this.originalText = element.dataset.originalText || element.innerText
-        this.splitText = new SplitType(element)
-      }
+    constructor(element: HTMLElement) {
+      this.element = element;
+      this.originalText = element.dataset.originalText || element.innerText;
+      this.splitText = new SplitType(element);
+    }
 
-      async animate(duration = 3000){
-        if (!this.splitText?.chars) return
-        const scrambleDuration = duration - 300
+    async animate(duration = 3000) {
+      if (!this.splitText?.chars) return;
+      const scrambleDuration = duration - 300;
 
-        gsap.set(this.splitText.chars, {
+      gsap.set(this.splitText.chars, {
         opacity: 1,
-        y: 0
-      })
+        y: 0,
+      });
 
-        this.splitText.chars.forEach((char, index) => {
-          const intervalId = window.setInterval(() => {
-            char.textContent = this.letters[Math.floor(Math.random() * this.letters.length)]
-          }, 50)
-          this.scramblesIntervals.push(intervalId)
-        })
+      this.splitText.chars.forEach((char, index) => {
+        const intervalId = window.setInterval(() => {
+          char.textContent = this.letters[Math.floor(Math.random() * this.letters.length)];
+        }, 50);
+        this.scramblesIntervals.push(intervalId);
+      });
 
-        await new Promise((resolve) => setTimeout(resolve, scrambleDuration))
+      await new Promise((resolve) => setTimeout(resolve, scrambleDuration));
 
-        this.scramblesIntervals.forEach(interval => clearInterval(interval))
+      this.scramblesIntervals.forEach((interval) => clearInterval(interval));
 
-        await gsap.to(this.splitText.chars, {
+      await gsap.to(this.splitText.chars, {
         opacity: 0,
         y: '100%',
         stagger: 0.01,
         ease: 'power2.in',
-      })
+      });
 
-        this.splitText.chars.forEach((char, index) => {
-          char.textContent = this.originalText[index]
-        })
+      this.splitText.chars.forEach((char, index) => {
+        char.textContent = this.originalText[index];
+      });
 
-        gsap.set(this.splitText.chars, {
+      gsap.set(this.splitText.chars, {
         opacity: 0,
-        y: '100%'
-      })
-
+        y: '100%',
+      });
 
       await gsap.to(this.splitText.chars, {
         opacity: 1,
@@ -87,48 +86,48 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`
         ease: 'power2.out',
         delay: 0.5,
         onStart: () => {
-          if(this.splitText?.chars){
-            this.splitText.chars.forEach(char => {
-              char.classList.remove('font-loading')
+          if (this.splitText?.chars) {
+            this.splitText.chars.forEach((char) => {
+              char.classList.remove('font-loading');
 
-              if(char.closest('.special')){
-                char.classList.add('font-titleita')
-              }else{
-                char.classList.add('font-custom')
+              if (char.closest('.special')) {
+                char.classList.add('font-titleita');
+              } else {
+                char.classList.add('font-custom');
               }
-            })
+            });
           }
-        }
-      })
+        },
+      });
     }
-      cleanup() {
-        this.scramblesIntervals.forEach(interval => clearInterval(interval))
+    cleanup() {
+      this.scramblesIntervals.forEach((interval) => clearInterval(interval));
+    }
+  }
+
+  function initializeAnimations() {
+    const elements = document.querySelectorAll('.animated-text');
+    const animators = Array.from(elements).map((element) => {
+      if (element instanceof HTMLElement) {
+        return new TextAnimator(element);
       }
-   }
+    });
 
-   function initializeAnimations() {
-      const elements = document.querySelectorAll('.animated-text')
-      const animators = Array.from(elements).map((element) => {
-        if(element instanceof HTMLElement){
-          return new TextAnimator(element)
-        }
-      })
+    const startAnim = () => animators.forEach((anim) => anim?.animate());
 
-      const startAnim = () => animators.forEach((anim) => anim?.animate())
+    let imagesLoaded = false;
+    let timeoutReached = false;
 
-      let imagesLoaded = false;
-      let timeoutReached = false;
+    setTimeout(() => {
+      timeoutReached = true;
+      if (imagesLoaded) startAnim();
+    }, 0);
 
-      setTimeout(() => {
-        timeoutReached = true
-        if(imagesLoaded) startAnim()
-      }, 0);
+    window.addEventListener('load', () => {
+      imagesLoaded = true;
+      if (timeoutReached) startAnim();
+    });
+  }
 
-      window.addEventListener('load', () => {
-        imagesLoaded = true
-        if(timeoutReached) startAnim()
-      })
-   }
-
-   document.addEventListener('DOMContentLoaded', initializeAnimations)
+  document.addEventListener('DOMContentLoaded', initializeAnimations);
 </script>

@@ -1,52 +1,61 @@
 ---
-import { Image } from 'astro:assets'
-import { getCollection, type CollectionEntry } from 'astro:content'
-import {Icon} from 'astro-icon/components'
+import { Image } from 'astro:assets';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import ScrambleTextHover from './animation/ScrambleTextHover.astro';
 
-  export interface Props {
-    category: string
-  }
-  const { category } = Astro.props
+export interface Props {
+  category: string;
+}
+const { category } = Astro.props;
 
-  const photos: CollectionEntry<'photos'>[] = await getCollection('photos', (photo: CollectionEntry<'photos'>) =>
-    photo.data.category === category && photo.data.id === '1'
-  )
+const photos: CollectionEntry<'photos'>[] = await getCollection(
+  'photos',
+  (photo: CollectionEntry<'photos'>) => photo.data.category === category && photo.data.id === '1'
+);
 ---
-  {photos.map((photo) => (
+
+{
+  photos.map((photo) => (
     <div class="flex flex-col gap-2 pt-2">
-      <h2 class="font-custom font-semi-bold text-4xl text-custom-black">
-        {photo.data.category}
-      </h2>
+      <h2 class="font-custom font-semi-bold text-4xl text-custom-black">{photo.data.category}</h2>
       <div class="flex gap-4 items-end">
-        <Image src={photo.data.image} alt={photo.data.title} width='700' height='1400' class='object-cover shader-image'/>
+        <div>
+          <Image
+            src={photo.data.image}
+            alt={photo.data.title}
+            width="700"
+            height="1400"
+            class="object-cover shader-image"
+          />
+        </div>
         <div class="border-t-2">
           <div class="pt-2 flex justify-between items-center gap-12">
-            <h3 class="font-custom text-2xl">
-              See more
-              {/* rendre dynamique */}
-            </h3>
-            <Icon name="lucide:arrow-right" class="text-2xl"/>
+            <ScrambleTextHover text="See More" className="font-custom text-2xl" />
+            {/* rendre dynamique */}
+
+            <Icon name="lucide:arrow-right" class="text-2xl" />
           </div>
         </div>
       </div>
     </div>
-  ))}
+  ))
+}
 
-  <script>
-    import { PixelShader } from "./animation/PixelShader";
-    document.addEventListener('DOMContentLoaded', () => {
-      const images = document.querySelectorAll('.shader-image')
-      images.forEach(img => {
-        const shaderEffect = new PixelShader(img)
-        img.parentElement?.addEventListener('mouseenter', () => {
-          shaderEffect.isHovered = true,
-          shaderEffect.start()
-        })
+<script>
+  import { PixelShader } from './animation/PixelShader';
+  document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('.shader-image');
+    images.forEach((img) => {
+      const shaderEffect = new PixelShader(img);
+      img.parentElement?.addEventListener('mouseenter', () => {
+        (shaderEffect.isHovered = true), shaderEffect.start();
+      });
 
-        img.parentElement?.addEventListener('mouseleave', () => {
-          shaderEffect.isHovered = false;
-          shaderEffect.stop();
-        });
-    })
-  })
-  </script>
+      img.parentElement?.addEventListener('mouseleave', () => {
+        shaderEffect.isHovered = false;
+        shaderEffect.stop();
+      });
+    });
+  });
+</script>
