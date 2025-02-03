@@ -1,0 +1,60 @@
+---
+export interface Props {
+  text: string;
+  className?: string;
+  delay?: number;
+}
+
+const { text, className = '', delay = 0 } = Astro.props;
+---
+
+<span class={`scramble-text ${className}`} data-delay={delay}>
+  {text}
+</span>
+
+<script>
+  import SplitType from 'split-type';
+
+  class ScrambleText {
+    chars = 'abcdefghijklmnopqrstuvwxyz';
+    iterations = 8;
+    originalText: string;
+    element: HTMLElement;
+    delay: number;
+    interval: number | null = null;
+
+    constructor(element: HTMLElement) {
+      this.element = element;
+      this.originalText = element.textContent || '';
+      this.delay = parseInt(element.dataset.delay || '0');
+    }
+
+    scramble() {
+      let counter = 0;
+      const finalText = this.originalText;
+
+      this.interval = window.setInterval(() => {
+        this.element.textContent = finalText
+          .split('')
+          .map((char, index) => {
+            if (index < counter / (this.iterations / 2)) {
+              return finalText[index];
+            }
+            return this.chars[Math.floor(Math.random() * this.chars.length)];
+          })
+          .join('');
+        counter++;
+      }, 50);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const elements = document.querySelectorAll('.scramble-text');
+    elements.forEach((element) => {
+      const scrambler = new ScrambleText(element as HTMLElement);
+      element.parentElement?.addEventListener('mouseenter', () => {
+        scrambler.scramble();
+      });
+    });
+  });
+</script>
