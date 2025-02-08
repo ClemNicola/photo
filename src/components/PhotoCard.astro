@@ -17,7 +17,7 @@ const photos: CollectionEntry<'photos'>[] = await getCollection(
 
 {
   photos.map((photo) => (
-    <div class="flex flex-col gap-2 pt-2">
+    <div class="flex flex-col gap-2">
       <h2 class="font-custom font-semi-bold text-4xl text-custom-black">{photo.data.category}</h2>
       <div class="flex gap-4 items-end">
         <div>
@@ -31,9 +31,9 @@ const photos: CollectionEntry<'photos'>[] = await getCollection(
         </div>
         <div class="border-t-2">
           <div class="pt-2 flex justify-between items-center gap-12">
-            <ScrambleTextHover text="See More" className="font-custom text-2xl" />
-            {/* rendre dynamique */}
-
+            <div class="min-w-36">
+              <ScrambleTextHover text="See More" className="font-custom text-2xl cursor-pointer" />
+            </div>
             <Icon name="lucide:arrow-right" class="text-2xl" />
           </div>
         </div>
@@ -55,6 +55,11 @@ const photos: CollectionEntry<'photos'>[] = await getCollection(
       img.parentElement?.addEventListener('mouseleave', () => {
         shaderEffect.isHovered = false;
         shaderEffect.stop();
+      });
+      window.addEventListener('resize', () => {
+        if (shaderEffect.isHovered) {
+          shaderEffect.resize();
+        }
       });
     });
   });
