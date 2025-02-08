@@ -7,11 +7,13 @@ export class PixelShader {
     this.scene = new THREE.Scene()
     this.camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1)
     this.lastMousePosition = new THREE.Vector2(0.5, 0.5)
+    const width = this.image.offsetWidth
+    const height = this.image.offsetHeight
 
     this.renderer = new THREE.WebGLRenderer({
       alpha: true,
     })
-    this.renderer.setSize(this.image.offsetWidth, this.image.offsetHeight)
+    this.renderer.setSize(width, height)
 
     const textureLoader = new THREE.TextureLoader()
     const texture = textureLoader.load(this.image.src, (tex) => {
@@ -64,7 +66,6 @@ export class PixelShader {
         }
       `
     });
-    console.log(this.material)
 
     const geometry = new THREE.PlaneGeometry(2, 2)
     const mesh = new THREE.Mesh(geometry, this.material)
@@ -79,15 +80,16 @@ export class PixelShader {
     this.renderer.domElement.style.left = '0';
 
     this.container.style.position = 'relative';
-    this.container.style.padding = '40px';
-    this.container.style.margin = '-40px';
+    this.container.style.padding = '20px';
+    this.container.style.margin = '-20px';
 
     this.image.style.position = 'relative';
     this.image.style.zIndex = '1';
+    this.image.style.objectFit = 'cover';
 
     this.renderer.domElement.style.position = 'absolute';
-    this.renderer.domElement.style.top = '40px';
-    this.renderer.domElement.style.left = '40px';
+    this.renderer.domElement.style.top = '20px';
+    this.renderer.domElement.style.left = '20px';
 
     this.container.appendChild(this.renderer.domElement);
     this.container.addEventListener('mousemove', this.onMouseMove.bind(this));
@@ -105,7 +107,7 @@ export class PixelShader {
 
   onMouseMove(e){
     const rect = this.container.getBoundingClientRect();
-    const padding = 40;
+    const padding = 20;
     const x = (e.clientX - (rect.left + padding)) / (rect.width - padding * 2);
     const y = 1.0 - (e.clientY -(rect.top + padding)) / (rect.height - padding * 2);
     const clampedX = Math.max(0, Math.min(1, x));
@@ -115,6 +117,14 @@ export class PixelShader {
     this.lastMousePosition.set(clampedX, clampedY);
   }
 
+  resize(){
+    const width = this.image.offsetWidth;
+    const height = this.image.offsetHeight;
+    this.renderer.setSize(width, height);
+    this.renderer.domElement.style.width = `${width}px`;
+    this.renderer.domElement.style.height = `${height}px`;
+    
+  }
   animate(time){
     if(this.isHovered){
       this.material.uniforms.time.value = time * 0.01
@@ -124,6 +134,7 @@ export class PixelShader {
   }
 
   start(){
+    this.resize();
     this.renderer.domElement.style.display = 'block'
     this.image.style.opacity = '0'
     if(!this.animationFrame){
