@@ -1,0 +1,66 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import dayjs from 'dayjs';
+
+export async function getStaticPaths() {
+  const photos: CollectionEntry<'photos'>[] = await getCollection('photos')
+  const categories = Array.from(new Set(photos.map(photo => photo.data.category)))
+  return categories.map(category => ({
+    params: {category}
+  }))
+}
+
+const { category } = Astro.params;
+
+const filteredPhotos: CollectionEntry<'photos'>[] = await getCollection(
+  'photos',
+  (photo: CollectionEntry<'photos'>) =>
+    photo.data.category === category
+);
+filteredPhotos.sort((a, b) => a.data.id - b.data.id);
+
+let date = new Date();
+---
+<Layout>
+  <div class="py-4 grid grid-cols-3 gap-x-32 gap-y-16">
+    {filteredPhotos.map((photo, index) => (
+      <div class={`flex flex-col gap-2 justify-center items-center transform ${
+        index % 4 === 0 ? 'translate-x-2 translate-y-2' :
+        index % 4 === 1 ? '-translate-x-2 -translate-y-2 ' :
+        index % 4 === 2 ? 'translate-x-2 translate-y-2' :
+        '-translate-x-2 -translate-y-2'
+      }`}>
+        <img src={photo.data.image} alt={photo.data.title} class="shader-image"/>
+        <p class="text-orange font-title text-2xl font-black">{photo.data.id}</p>
+      </div>
+    ))}
+  </div>
+  <div class="flex justify-between items-center py-4 font-custom text-xl">
+    <p>{dayjs(date).format('ddd, MMM DD, YYYY HH:mm A')}</p>
+    <p>{category}</p>
+  </div>
+</Layout>
+
+<script>
+  import { PixelShader } from "../../components/animation/PixelShader";
+  document.addEventListener('DOMContentLoaded', () => {
+    const images = document.querySelectorAll('.shader-image');
+    images.forEach((img) => {
+      const shaderEffect = new PixelShader(img);
+      img.parentElement?.addEventListener('mouseenter', () => {
+        (shaderEffect.isHovered = true), shaderEffect.start();
+      });
+
+      img.parentElement?.addEventListener('mouseleave', () => {
+        shaderEffect.isHovered = false;
+        shaderEffect.stop();
+      });
+      window.addEventListener('resize', () => {
+        if (shaderEffect.isHovered) {
+          shaderEffect.resize();
+        }
+      });
+    });
+  });
+</script>
