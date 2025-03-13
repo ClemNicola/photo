@@ -1,0 +1,54 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import dayjs from 'dayjs';
+import ScrambleTextHover from '../../../components/animation/ScrambleTextHover.astro';
+
+export async function getStaticPaths() {
+    const photos: CollectionEntry<'photos'>[] = await getCollection('photos')
+    return photos.map((photo) => ({
+        params: {
+            category: photo.data.category,
+            id: photo.data.id
+        },
+        props: {photo}
+    }))
+}
+
+const { photo } = Astro.props;
+const colorChange = (title: string) => {
+    switch (title) {
+        case 'Seaside':
+        case 'Just a foot':
+            return 'text-custom-white font-custom text-base font-medium';
+        case 'Locked up':
+            return 'text-custom-white font-custom text-base font-medium';
+        case 'Brutalism':
+            return 'text-custom-black font-custom text-base font-medium';
+        default:
+            return 'text-creme font-custom text-base font-medium';
+    }
+}
+---
+
+<Layout>
+    <div class="p-4 ">
+        <div class="relative max-w-5xl mx-auto">
+            <img src={photo.data.image} alt={photo.data.title} class="w-full h-auto object-cover"/>
+            <div class="absolute bottom-8 right-3 flex flex-col gap-4 backdrop-blur-[3px] p-6 min-w-[20em] bg-custom-black/10">
+                <div class="hover-trigger">
+                    <ScrambleTextHover text={photo.data.title} className={`${colorChange(photo.data.title)} font-custom text-base font-medium`} />
+                </div>
+                <div class="hover-trigger">
+                    <ScrambleTextHover text={photo.data.category} className={`${colorChange(photo.data.title)} font-custom text-base font-medium`} />
+                </div>
+                <div class="hover-trigger">
+                    <ScrambleTextHover text={photo.data.place} className={`${colorChange(photo.data.title)} font-custom text-base font-medium`} />
+                </div>
+                <div class="hover-trigger">
+                    <ScrambleTextHover text={dayjs(photo.data.date).format('ddd, MMM DD, YYYY HH:mm A')} className={`${colorChange(photo.data.title)} `} />
+                </div>
+            </div>
+        </div>
+    </div>
+</Layout>
