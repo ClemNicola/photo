@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {},
     colors: {
-      creme: '#F2DAC4',
+      creme: '#fcefe3',
       'light-orange': '#F09B6A',
       brown: '#A68358',
       orange: '#F28322',

@@ -45,7 +45,7 @@ const { text, className = '', delay = 0 } = Astro.props;
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const elements = document.querySelectorAll<HTMLElement>('.scramble-text');
     elements.forEach((element) => {
       const scrambleText = new ScrambleText(element);
