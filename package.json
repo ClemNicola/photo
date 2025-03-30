@@ -13,21 +13,21 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@astrojs/tailwind": "6.0.0",
-    "@iconify-json/lucide": "^1.2.25",
-    "@iconify/json": "^2.2.301",
-    "astro": "5.2.1",
+    "@astrojs/tailwind": "6.0.2",
+    "@iconify-json/lucide": "^1.2.29",
+    "@iconify/json": "^2.2.316",
+    "astro": "5.5.5",
     "astro-icon": "^1.1.5",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
-    "decap-cms-app": "^3.5.0",
-    "decap-server": "^3.1.2",
-    "eslint": "^9.18.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.2",
+    "decap-cms-app": "^3.6.2",
+    "decap-server": "^3.2.0",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.3",
     "gsap": "^3.12.7",
     "lucide": "^0.474.0",
-    "prettier": "^3.4.2",
+    "prettier": "^3.5.3",
     "split-type": "^0.3.4",
     "tailwindcss": "^3.4.17",
     "three": "^0.173.0"
@@ -37,6 +37,6 @@
     "@types/bun": "latest"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.7.3"
   }
 }
