@@ -3,6 +3,7 @@ import Layout from '../../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import dayjs from 'dayjs';
 import ScrambleTextHover from '../../../components/animation/ScrambleTextHover.astro';
+import { slide } from 'astro:transitions';
 
 export async function getStaticPaths() {
     const photos: CollectionEntry<'photos'>[] = await getCollection('photos')
@@ -29,9 +30,11 @@ const colorChange = (title: string) => {
             return 'text-creme font-custom text-base font-medium';
     }
 }
+
+
 ---
 
-<Layout>
+<Layout title={photo.data.title}>
     <div class="p-4 ">
         <div class="relative max-w-5xl mx-auto">
             <img src={photo.data.image} alt={photo.data.title} class="w-full h-auto object-cover"/>

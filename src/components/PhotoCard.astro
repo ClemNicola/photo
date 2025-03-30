@@ -48,7 +48,7 @@ const photos: CollectionEntry<'photos'>[] = await getCollection(
 
 <script>
   import { PixelShader } from './animation/PixelShader';
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const images = document.querySelectorAll('.shader-image');
     images.forEach((img) => {
       const shaderEffect = new PixelShader(img);

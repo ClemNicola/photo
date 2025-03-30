@@ -2,7 +2,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import dayjs from 'dayjs';
-import { slide } from 'astro:transitions';
+
 
 export async function getStaticPaths() {
   const photos: CollectionEntry<'photos'>[] = await getCollection('photos')
@@ -23,8 +23,7 @@ filteredPhotos.sort((a, b) => a.data.id - b.data.id);
 
 let date = new Date();
 ---
-<Layout>
-  <aside transition:name="custom-transition-1" transition-animate={slide({duration: 0.5})}>
+<Layout title={category}>
     <div class="py-4 grid grid-cols-3 gap-x-32 gap-y-16">
     {filteredPhotos.map((photo, index) => (
       <div class={`flex flex-col gap-2 justify-center items-center transform ${
@@ -48,7 +47,7 @@ let date = new Date();
 
 <script>
   import { PixelShader } from "../../components/animation/PixelShader";
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const images = document.querySelectorAll('.shader-image');
     images.forEach((img) => {
       const shaderEffect = new PixelShader(img);
