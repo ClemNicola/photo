@@ -1,55 +1,14 @@
 ---
 import '../styles/global.css'
 import { ClientRouter } from 'astro:transitions';
-import { slide } from 'astro:transitions';
 export interface Prop {
 	title?: string
 }
 
-export interface TransitionAnimation {
-	name: string;
-	delay?: number | string;
-	duration?: number | string;
-	easing?: string;
-	fillMode?: string;
-	direction?: string;
-}
-
-export interface TransitionAnimationPair {
-  old: TransitionAnimation | TransitionAnimation[];
-  new: TransitionAnimation | TransitionAnimation[];
-}
-
-export interface TransitionDirectionalAnimations {
-  forwards: TransitionAnimationPair;
-  backwards: TransitionAnimationPair;
-}
-
-const animmation: TransitionAnimationPair = {
-  old: {
-    name: "slideOutRight",
-    duration: "0.5s",
-    easing: "ease-in",
-    direction: "right",
-  },
-  new: {
-    name: "slideInRight ",
-    duration: "0.5s",
-    easing: "ease-in",
-    direction: "right",
-  }
-}
-
-const customTransition: TransitionDirectionalAnimations = {
-  forwards: animmation,
-  backwards: animmation
-}
-
-
 const {title} = Astro.props
 ---
 <!doctype html>
-<html lang="en" transition:name="root" transition:animate="none">
+<html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
@@ -57,59 +16,10 @@ const {title} = Astro.props
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		<ClientRouter/>
-		
 	</head>
-	<body class="bg-creme overflow-x-hidden">
-    <main class="container mx-auto" transition:animate={customTransition}>
-      <slot/>
-    </main>
-	</body>
+  <body class="bg-creme overflow-x-hidden">
+    <main class="container mx-auto">
+        <slot/>
+      </main>
+    </body>
 </html>
-
-<style is:global>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-
-    @keyframes slideOutRight {
-        0% {
-            transform: translateX(0);
-            background: #F09B6A;
-        }
-        30% {
-            transform: translateX(40%);
-            background: #F09B6A;
-        }
-        40% {
-            transform: translateX(40%);
-            background: #F09B6A;
-        }
-        100% {
-            transform: translateX(100%);
-            background: #F09B6A;
-        }
-    }
-
-    @keyframes slideInRight {
-        0% {
-            transform: translateX(-100%);
-            background: #F09B6A;
-        }
-        30% {
-            transform: translateX(-40%);
-            background: #F09B6A;
-        }
-        40% {
-            transform: translateX(-40%);
-            background: #F09B6A;
-        }
-        100% {
-            transform: translateX(0);
-            background: #F09B6A;
-        }
-    }
-
-</style>
