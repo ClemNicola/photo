@@ -1,0 +1,43 @@
+---
+    export interface Props {
+        title: string;
+    }
+
+    const { title }: Props = Astro.props;
+---
+
+<div class="relative">
+  <div id="transition-overlay" class="fixed inset-0 bg-orange z-50 transform translate-x-full flex items-center justify-center">
+    <h1 class="text-creme text-7xl font-titleita">{title}</h1> 
+  </div>
+  <div id="page-content" class="opacity-0">
+      <slot />
+  </div>
+</div>
+
+<script>
+  import gsap from 'gsap';
+  // Animation d'entrée
+  document.addEventListener('astro:page-load', () => {
+    gsap.to('#transition-overlay', {
+        x: 0,
+        easeIn: 'power3.inout',
+        onComplete: () => {
+            // Animation de sortie après un court délai
+            setTimeout(() => {
+                gsap.timeline()
+                    .to('#transition-overlay', {
+                        x: '100%',
+                        duration: 0.5,
+                        ease: 'power2.inOut'
+                    })
+                    .to('#page-content', {
+                        opacity: 1,
+                        duration: 0.5,
+                        ease: 'power2.inOut'
+                    }, '-=0.5'); 
+            }, 500);
+        },
+    });
+  });
+</script>
