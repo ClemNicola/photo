@@ -4,6 +4,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import dayjs from 'dayjs';
 import ScrambleTextHover from '../../../components/animation/ScrambleTextHover.astro';
 import TransitionPage from '../../../components/animation/TransitionPage.astro';
+import NavBar from '../../../components/NavBar.astro';
 
 export async function getStaticPaths() {
     const photos: CollectionEntry<'photos'>[] = await getCollection('photos')
@@ -36,8 +37,9 @@ const colorChange = (title: string) => {
 
 <Layout title={photo.data.title}>
     <TransitionPage title={photo.data.title}>
-        <div class="p-4 ">
-            <div class="relative max-w-5xl mx-auto">
+        <NavBar />
+        <div class="p-4 flex items-center justify-center h-[calc(100svh-80px)]">
+            <div class="relative max-w-5xl w-full">
                 <img src={photo.data.image} alt={photo.data.title} class="w-full h-auto object-cover"/>
                 <div class="absolute bottom-8 right-3 flex flex-col gap-4 backdrop-blur-[3px] p-6 min-w-[20em] bg-custom-black/10">
                     <div class="hover-trigger">
