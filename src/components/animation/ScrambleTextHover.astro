@@ -14,8 +14,8 @@ const { text, className = '', delay = 0 } = Astro.props;
 
 <script>
   class ScrambleText {
-    chars = 'abcdefghijklmnopqrstuvwxyz';
-    iterations = 8;
+    chars = 'abcdefghijklmnopqrst';
+    iterations = 10;
     originalText: string;
     element: HTMLElement;
     delay: number;
@@ -41,7 +41,7 @@ const { text, className = '', delay = 0 } = Astro.props;
           .map(() => this.chars[Math.floor(Math.random() * this.chars.length)])
           .join('');
         iteration++;
-      }, 30);
+      }, 80);
     }
   }
 
@@ -49,7 +49,7 @@ const { text, className = '', delay = 0 } = Astro.props;
     const elements = document.querySelectorAll<HTMLElement>('.scramble-text');
     elements.forEach((element) => {
       const scrambleText = new ScrambleText(element);
-      element.parentElement?.addEventListener('mouseenter', () => {
+      element.addEventListener('mouseenter', () => {
         scrambleText.scramble();
       });
     });
