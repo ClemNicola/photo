@@ -6,11 +6,16 @@ export interface Props {
 }
 const { text, className = '', delay = 0 } = Astro.props;
 const id = `scramble-${Math.random().toString(36).substring(2)}`;
+
 ---
 
 <span
   id={id}
-  class:list={['animated-text', className]}
+  class:list={[
+    'animated-text',
+    'font-loading',
+    className
+  ]}
   data-original-text={text}
   data-delay={delay}
 >
@@ -55,7 +60,7 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
       this.splitText.chars.forEach((char, index) => {
         const intervalId = window.setInterval(() => {
           char.textContent = this.letters[Math.floor(Math.random() * this.letters.length)];
-        }, 50);
+        }, 100);
         this.scramblesIntervals.push(intervalId);
       });
 
@@ -107,13 +112,37 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
 
   function initializeAnimations() {
     const elements = document.querySelectorAll('.animated-text');
+    const hasAnimated = localStorage.getItem('textAnimationsDone') === 'true';
+
+    if (hasAnimated) {
+      elements.forEach((element) => {
+        if (element instanceof HTMLElement) {
+          element.classList.remove('font-loading');
+          if (element.closest('.special')) {
+            element.classList.add('font-titleita');
+          } else {
+            element.classList.add('font-custom');
+          }
+        }
+      });
+      return;
+    }
+
     const animators = Array.from(elements).map((element) => {
       if (element instanceof HTMLElement) {
         return new TextAnimator(element);
       }
     });
 
-    const startAnim = () => animators.forEach((anim) => anim?.animate());
+    const startAnim = () => {
+      animators.forEach((anim) => {
+        if (anim) {
+          anim.animate().then(() => {
+            localStorage.setItem('textAnimationsDone', 'true');
+          });
+        }
+      });
+    };
 
     let imagesLoaded = false;
     let timeoutReached = false;
@@ -124,10 +153,17 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
     }, 0);
 
     window.addEventListener('load', () => {
+      console.log('Window loaded');
       imagesLoaded = true;
       if (timeoutReached) startAnim();
     });
   }
 
-  document.addEventListener('DOMContentLoaded', initializeAnimations);
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeAnimations();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    localStorage.removeItem('textAnimationsDone');
+  });
 </script>
