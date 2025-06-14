@@ -11,6 +11,7 @@ const photosByCategory = photos.reduce((acc, category) => {
     acc[category.data.category] = photos.filter(photo => photo.data.category === category.data.category)
     return acc
 }, {} as Record<string, CollectionEntry<'photos'>[]>)
+
 ---
 
 <Layout title="Themes" color="bg-orange">
@@ -18,22 +19,20 @@ const photosByCategory = photos.reduce((acc, category) => {
         <NavBar color="text-creme" />
             <div class="flex flex-col gap-4 h-[calc(100svh-80px)] items-center justify-center">
                 {categories.map(category => (
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 group relative">
                         <a 
-                            href={`/theme/${category.data.category}`}
-                            class="text-8xl font-title text-creme relative z-10 px-8 py-4"
+                            href={`/category/${category.data.category}`}
+                            class="text-8xl font-title text-creme relative z-10 px-8 py-4 transition-all duration-300 translate-x-[5%] group-hover:translate-x-[0]"
                         >
                             {category.data.category}
                         </a>
-                        <div class="hidden group-hover:block">
-                            {photosByCategory[category.data.category] && photosByCategory[category.data.category].length > 0 && (
-                                <img 
-                                    src={photosByCategory[category.data.category][Math.floor(Math.random() * photosByCategory[category.data.category].length)].data.image} 
-                                    alt=""
-                                    class="w-[150px] h-auto object-cover"
-                                />
-                            )}
-                        </div>
+                        {photosByCategory[category.data.category] && photosByCategory[category.data.category].length > 0 && (
+                            <img 
+                                src={photosByCategory[category.data.category][Math.floor(Math.random() * photosByCategory[category.data.category].length)].data.image} 
+                                alt=""
+                                class="w-[150px] h-auto object-cover transition-all duration-300 [clip-path:inset(0_100%_0_0)] group-hover:[clip-path:inset(0_0_0_0)]"
+                            />
+                        )}
                     </div>
                 ))}
             </div>
