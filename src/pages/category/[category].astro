@@ -24,9 +24,9 @@ filteredPhotos.sort((a, b) => a.data.id - b.data.id);
 
 let date = new Date();
 ---
-<Layout title={category}>
+<Layout title={category} color="bg-creme">
   <TransitionPage title={category}>
-    <NavBar />
+    <NavBar color="custom-black" />
 
     <div class="py-4 grid grid-cols-3 gap-x-32 gap-y-16">
     {filteredPhotos.map((photo, index) => (
