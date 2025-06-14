@@ -1,14 +1,16 @@
 ---
     export interface Props {
         title: string;
+        color?: string;
+        textColor?: string;
     }
 
-    const { title }: Props = Astro.props;
+    const { title, color='bg-orange', textColor='text-creme' }: Props = Astro.props;
 ---
 
 <div class="relative">
-  <div id="transition-overlay" class="fixed inset-0 bg-orange z-50 transform translate-x-full flex items-center justify-center">
-    <h1 class="text-creme text-7xl font-titleita">{title}</h1> 
+  <div id="transition-overlay" class={`fixed inset-0 ${color} z-50 transform translate-x-full flex items-center justify-center`}>
+    <h1 class={`${textColor} text-7xl font-titleita`}>{title}</h1> 
   </div>
   <div id="page-content" class="opacity-0">
       <slot />
