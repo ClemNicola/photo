@@ -1,0 +1,41 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import TransitionPage from '../../components/animation/TransitionPage.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+const categories: CollectionEntry<'categories'>[] = await getCollection('categories');
+const photos: CollectionEntry<'photos'>[] = await getCollection('photos')
+
+const photosByCategory = photos.reduce((acc, category) => {
+    acc[category.data.category] = photos.filter(photo => photo.data.category === category.data.category)
+    return acc
+}, {} as Record<string, CollectionEntry<'photos'>[]>)
+---
+
+<Layout title="Themes" color="bg-orange">
+    <TransitionPage title="Themes" color="bg-creme" textColor="text-orange">
+        <NavBar color="text-creme" />
+            <div class="flex flex-col gap-4 h-[calc(100svh-80px)] items-center justify-center">
+                {categories.map(category => (
+                    <div class="flex items-center gap-2">
+                        <a 
+                            href={`/theme/${category.data.category}`}
+                            class="text-8xl font-title text-creme relative z-10 px-8 py-4"
+                        >
+                            {category.data.category}
+                        </a>
+                        <div class="hidden group-hover:block">
+                            {photosByCategory[category.data.category] && photosByCategory[category.data.category].length > 0 && (
+                                <img 
+                                    src={photosByCategory[category.data.category][Math.floor(Math.random() * photosByCategory[category.data.category].length)].data.image} 
+                                    alt=""
+                                    class="w-[150px] h-auto object-cover"
+                                />
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+    </TransitionPage>
+</Layout> 
