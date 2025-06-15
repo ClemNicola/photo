@@ -21,7 +21,7 @@ const photosByCategory = photos.reduce((acc, category) => {
                 {categories.map(category => {
                     const uniqueId = Math.random().toString(36).substring(7);
                     return (
-                        <div class="flex items-center group">
+                        <div class="flex items-center gap-2 group">
                             <a 
                                 href={`/category/${category.data.category}`}
                                 class="text-8xl font-title text-creme relative z-10 px-8 py-4 transition-all duration-300 translate-x-[7%] group-hover:translate-x-[0]"
