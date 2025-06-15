@@ -18,23 +18,93 @@ const photosByCategory = photos.reduce((acc, category) => {
     <TransitionPage title="Themes" color="bg-creme" textColor="text-orange">
         <NavBar color="text-creme" />
             <div class="flex flex-col gap-4 h-[calc(100svh-80px)] items-center justify-center">
-                {categories.map(category => (
-                    <div class="flex items-center gap-2 group relative">
-                        <a 
-                            href={`/category/${category.data.category}`}
-                            class="text-8xl font-title text-creme relative z-10 px-8 py-4 transition-all duration-300 translate-x-[5%] group-hover:translate-x-[0]"
-                        >
-                            {category.data.category}
-                        </a>
-                        {photosByCategory[category.data.category] && photosByCategory[category.data.category].length > 0 && (
-                            <img 
-                                src={photosByCategory[category.data.category][Math.floor(Math.random() * photosByCategory[category.data.category].length)].data.image} 
-                                alt=""
-                                class="w-[150px] h-auto object-cover transition-all duration-300 [clip-path:inset(0_100%_0_0)] group-hover:[clip-path:inset(0_0_0_0)]"
-                            />
-                        )}
-                    </div>
-                ))}
+                {categories.map(category => {
+                    const uniqueId = Math.random().toString(36).substring(7);
+                    return (
+                        <div class="flex items-center group">
+                            <a 
+                                href={`/category/${category.data.category}`}
+                                class="text-8xl font-title text-creme relative z-10 px-8 py-4 transition-all duration-300 translate-x-[7%] group-hover:translate-x-[0]"
+                            >
+                                {category.data.category}
+                            </a>
+                            {photosByCategory[category.data.category] && photosByCategory[category.data.category].length > 0 && (
+                                <div class="relative w-[200px] h-[125px]">
+                                    <div id={`canvas-${uniqueId}`} class="absolute inset-0 h-full w-full">
+                                        <div class={`liquide-plane-${uniqueId} w-full h-full`}>
+                                            <img 
+                                                src={photosByCategory[category.data.category][Math.floor(Math.random() * photosByCategory[category.data.category].length)].data.image} 
+                                                class="hidden"
+                                                crossorigin="anonymous"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
     </TransitionPage>
-</Layout> 
+</Layout>
+
+<script>
+    import { LiquidShader } from '../../components/animation/LiquidShader';
+    console.log('LiquidShader loaded');
+
+    document.addEventListener('astro:page-load', () => {
+        document.querySelectorAll('[id^="canvas-"]').forEach(canvas => {
+            const uniqueId = canvas.id.replace('canvas-', '');
+            new LiquidShader(
+                `canvas-${uniqueId}`,
+                `liquide-plane-${uniqueId}`,
+                document.querySelector(`.liquide-plane-${uniqueId} img`)
+            );
+        });
+    });
+</script>
+
+<script id="plane-vs" type="x-shader/x-vertex">
+    precision mediump float;
+
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat4 uTextureMatrix0;
+
+    varying vec3 vVertexPosition;
+    varying vec2 vTextureCoord;
+
+    void main() {
+        vec3 vertexPosition = aVertexPosition;
+        gl_Position = uPMatrix * uMVMatrix * vec4(vertexPosition, 1.0);
+        vTextureCoord = (uTextureMatrix0 * vec4(aTextureCoord, 0.0, 1.0)).xy;
+        vVertexPosition = vertexPosition;
+    }
+</script>
+
+<script id="plane-fs" type="x-shader/x-fragment">
+    precision mediump float;
+
+    varying vec2 vTextureCoord;
+
+    uniform float uTime;
+    uniform sampler2D uSampler0;
+
+    void main() {
+        vec2 textureCoord = vTextureCoord;
+        
+        // Create smoother wave effect with multiple frequencies
+        float wave1 = sin(textureCoord.y * 15.0 + uTime * 0.02) * 0.02;
+        float wave2 = cos(textureCoord.x * 20.0 + uTime * 0.02) * 0.01;
+        float wave3 = sin(textureCoord.y * 5.0 + textureCoord.x * 5.0 + uTime * 0.01) * 0.01;
+        
+        
+        textureCoord.x += wave1 + wave2 + wave3;
+        textureCoord.y += wave2 * 0.7 + wave3 * 0.4;
+        
+        gl_FragColor = texture2D(uSampler0, textureCoord);
+    }
+</script>
