@@ -4,5 +4,11 @@
   "printWidth": 100,
   "singleQuote": true,
   "trailingComma": "es5",
-  "bracketSpacing": true
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "htmlWhitespaceSensitivity": "css",
+  "jsxSingleQuote": false,
+  "quoteProps": "as-needed",
+  "useTabs": false
 }

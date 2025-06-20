@@ -5,37 +5,37 @@ backend:
 
 local_backend: true
 
-media_folder: "public/images"
-public_folder: "/images"
+media_folder: 'public/images'
+public_folder: '/images'
 
 collections:
-  - name: "categories"
-    label: "Catégories"
-    folder: "src/content/categories"
+  - name: 'categories'
+    label: 'Catégories'
+    folder: 'src/content/categories'
     create: true
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     fields:
-      - {label: "Category", name: "category", widget: "string"}
-  - name: "my_photos"
-    label: "Photos"
-    folder: "src/content/photos"
-    path: "{{category}}/{{slug}}"
+      - { label: 'Category', name: 'category', widget: 'string' }
+  - name: 'my_photos'
+    label: 'Photos'
+    folder: 'src/content/photos'
+    path: '{{category}}/{{slug}}'
     create: true
-    slug: "{{slug}}"
-    media_folder: "/public/images"
-    public_folder: "/images"
+    slug: '{{slug}}'
+    media_folder: '/public/images'
+    public_folder: '/images'
     fields:
-      - {label: "ID", name: "id", widget: "string"}
-      - {label: "Titre", name: "title", widget: "string"}
-      - {label: "Date", name: "date", widget: "datetime"}
-      - {label: "Image", name: "image", widget: "image"}
+      - { label: 'ID', name: 'id', widget: 'string' }
+      - { label: 'Titre', name: 'title', widget: 'string' }
+      - { label: 'Date', name: 'date', widget: 'datetime' }
+      - { label: 'Image', name: 'image', widget: 'image' }
       - {
-          label: "Catégorie",
-          name: "category",
-          widget: "relation",
-          collection: "categories",
-          search_fields: ["category"],
-          value_field: "category",
-          display_fields: ["category"]
+          label: 'Catégorie',
+          name: 'category',
+          widget: 'relation',
+          collection: 'categories',
+          search_fields: ['category'],
+          value_field: 'category',
+          display_fields: ['category'],
         }
-      - {label: "Lieu", name: "place", widget: "string"}
+      - { label: 'Lieu', name: 'place', widget: 'string' }
