@@ -1,0 +1,109 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import TransitionPage from '../../components/animation/TransitionPage.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+const photos: CollectionEntry<'photos'>[] = await getCollection('photos');
+const sortedPhotos = photos.sort((a, b) => a.data.category.localeCompare(b.data.category));
+
+const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
+---
+
+<Layout title="Overview" color="bg-creme">
+    <TransitionPage title="Overview" color="bg-orange" textColor="text-creme">
+        <NavBar color="text-orange" />
+        
+        <div class="infinite-scroll-wrapper relative overflow-hidden">
+            <div class="grid grid-cols-4 gap-x-16 gap-y-16 infinite-scroll-container p-16">
+                {duplicatedPhotos.map((photo, index) => (
+                    <div 
+                        class={`max-w-full h-auto block justify-center items-center transform ${
+                            index % 4 === 0 ? 'translate-x-2 translate-y-2' :
+                            index % 4 === 1 ? '-translate-x-2 -translate-y-2 ' :
+                            index % 4 === 2 ? 'translate-x-2 translate-y-2' :
+                            '-translate-x-2 -translate-y-2'
+                        }`}
+                        data-index={index}
+                    >
+                        <div id={`scroll-distortion-${index}`} class="relative overflow-hidden">
+                            <div class={`scroll-distortion-plane-${index}`}>
+                                <a href={`/category/${photo.data.category}/${photo.data.id}`}>
+                                    <img 
+                                        src={photo.data.image} 
+                                        alt={photo.data.title}
+                                        loading="lazy"
+                                    />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </TransitionPage>
+</Layout>
+
+<script>
+    import Lenis from 'lenis';
+
+    let lenis: Lenis;
+
+    function initInfiniteScroll() {
+        if (lenis) {
+            lenis.destroy();
+        }
+
+        lenis = new Lenis({
+            duration: 0.9,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            gestureOrientation: 'vertical',
+            smoothWheel: true,
+            wheelMultiplier: 0.8,
+            touchMultiplier: 1.5,
+            infinite: true
+        });
+
+        function raf(time: number) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        const container = document.querySelector('.infinite-scroll-container') as HTMLElement;
+        if (!container) return;
+
+        const originalContent = container.innerHTML;
+        container.innerHTML = originalContent + originalContent + originalContent;
+
+        lenis.on('scroll', (e) => {
+            const scrollTop = e.scroll;
+            const containerHeight = container.offsetHeight;
+            const singleContentHeight = containerHeight / 3;
+            
+            
+            if (scrollTop < 0) {
+                lenis.scrollTo(scrollTop + singleContentHeight, { immediate: true });
+            }
+        });
+    }
+
+    document.addEventListener('astro:page-load', initInfiniteScroll);
+    
+    document.addEventListener('astro:before-preparation', () => {
+        if (lenis) {
+            lenis.destroy();
+        }
+    });
+
+    let resizeTimeout: ReturnType<typeof setTimeout>;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (lenis) {
+                lenis.resize();
+            }
+        }, 250);
+    });
+</script>
