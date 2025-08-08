@@ -7,7 +7,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 const photos: CollectionEntry<'photos'>[] = await getCollection('photos');
 const sortedPhotos = photos.sort((a, b) => a.data.category.localeCompare(b.data.category));
 
-const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
+const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
 ---
 
 <Layout title="Overview" color="bg-creme">
@@ -46,12 +46,20 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
 
 <script>
     import Lenis from 'lenis';
+    import * as THREE from 'three';
 
     let lenis: Lenis;
+    let effectCanvas: any = null;
+    let scrollVelocity = 0;
 
     function initInfiniteScroll() {
         if (lenis) {
             lenis.destroy();
+        }
+
+        if (effectCanvas) {
+            effectCanvas.destroy();
+            effectCanvas = null;
         }
 
         lenis = new Lenis({
@@ -65,28 +73,25 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
             infinite: true
         });
 
+        lenis.on('scroll', (e: any) => {
+            scrollVelocity = e.velocity || 0;
+        });
+
+        const wrapper = document.querySelector('.infinite-scroll-wrapper') as HTMLElement;
+        const container = document.querySelector('.infinite-scroll-container') as HTMLElement;
+        if (!wrapper || !container) return;
+
+        // Wait for images to be ready, then init the effect canvas
+        waitForImages(container).then(() => {
+            effectCanvas = new EffectCanvas(wrapper);
+        });
+
         function raf(time: number) {
             lenis.raf(time);
+            if (effectCanvas) effectCanvas.render(scrollVelocity);
             requestAnimationFrame(raf);
         }
         requestAnimationFrame(raf);
-
-        const container = document.querySelector('.infinite-scroll-container') as HTMLElement;
-        if (!container) return;
-
-        const originalContent = container.innerHTML;
-        container.innerHTML = originalContent + originalContent + originalContent;
-
-        lenis.on('scroll', (e) => {
-            const scrollTop = e.scroll;
-            const containerHeight = container.offsetHeight;
-            const singleContentHeight = containerHeight / 3;
-            
-            
-            if (scrollTop < 0) {
-                lenis.scrollTo(scrollTop + singleContentHeight, { immediate: true });
-            }
-        });
     }
 
     document.addEventListener('astro:page-load', initInfiniteScroll);
@@ -94,6 +99,10 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
     document.addEventListener('astro:before-preparation', () => {
         if (lenis) {
             lenis.destroy();
+        }
+        if (effectCanvas) {
+            effectCanvas.destroy();
+            effectCanvas = null;
         }
     });
 
@@ -104,6 +113,214 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
             if (lenis) {
                 lenis.resize();
             }
+            if (effectCanvas) {
+                effectCanvas.onWindowResize();
+            }
         }, 250);
     });
+
+    function waitForImages(root: HTMLElement) {
+        const imgs = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
+        const unloaded = imgs.filter((img) => !img.complete || img.naturalWidth === 0);
+        if (unloaded.length === 0) return Promise.resolve();
+        return Promise.all(
+            unloaded.map((img) =>
+                new Promise<void>((resolve) => {
+                    img.addEventListener('load', () => resolve(), { once: true });
+                    img.addEventListener('error', () => resolve(), { once: true });
+                })
+            )
+        );
+    }
+
+    const fragmentShader = `
+        uniform sampler2D uTexture;
+        uniform float uAlpha;
+        uniform vec2 uOffset;
+        varying vec2 vUv;
+
+        vec3 rgbShift(sampler2D textureImage, vec2 uv, vec2 offset) {
+            float r = texture2D(textureImage, uv + offset).r;
+            vec2 gb = texture2D(textureImage, uv).gb;
+            return vec3(r, gb);
+        }
+
+        void main() {
+            vec3 color = rgbShift(uTexture, vUv, uOffset);
+            gl_FragColor = vec4(color, uAlpha);
+        }
+    `;
+
+    const vertexShader = `
+        uniform sampler2D uTexture;
+        uniform vec2 uOffset;
+        varying vec2 vUv;
+
+        #define M_PI 3.1415926535897932384626433832795
+
+        vec3 deformationCurve(vec3 position, vec2 uv, vec2 offset) {
+            position.x = position.x + (sin(uv.y * M_PI) * offset.x);
+            position.y = position.y + (sin(uv.x * M_PI) * offset.y);
+            return position;
+        }
+
+        void main() {
+            vUv = uv;
+            vec3 newPosition = deformationCurve(position, uv, uOffset);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+        }
+    `;
+
+    class EffectCanvas {
+        containerEl: HTMLElement;
+        renderer: any;
+        scene: any;
+        camera: any;
+        images: HTMLImageElement[];
+        meshItems: MeshItem[] = [];
+        perspective = 1000;
+
+        constructor(containerEl: HTMLElement) {
+            this.containerEl = containerEl;
+            this.images = Array.from(document.querySelectorAll('.infinite-scroll-container img')) as HTMLImageElement[];
+            this.setupThree();
+            this.createMeshItems();
+            console.log("containerEl", this.containerEl);
+            console.log("images", this.images);
+
+        }
+
+        get viewport() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const aspectRatio = width / height;
+            return { width, height, aspectRatio };
+        }
+
+        setupThree() {
+            this.scene = new THREE.Scene();
+
+            const fov = (180 * (2 * Math.atan(window.innerHeight / (2 * this.perspective)))) / Math.PI;
+            this.camera = new THREE.PerspectiveCamera(fov, this.viewport.aspectRatio, 1, 2000);
+            this.camera.position.set(0, 0, this.perspective);
+
+            this.renderer = new THREE.WebGL1Renderer({ antialias: true, alpha: true });
+            this.renderer.setClearColor(0x000000, 0);
+            this.renderer.setSize(this.viewport.width, this.viewport.height);
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            this.containerEl.appendChild(this.renderer.domElement);
+            const canvas = this.renderer.domElement as HTMLCanvasElement;
+            canvas.style.position = 'fixed';
+            canvas.style.inset = '0px';
+            canvas.style.width = '100vw';
+            canvas.style.height = '100vh';
+            canvas.style.pointerEvents = 'none';
+        }
+
+        onWindowResize() {
+            const { width, height, aspectRatio } = this.viewport;
+            this.camera.aspect = aspectRatio;
+            this.camera.fov = (180 * (2 * Math.atan(height / (2 * this.perspective)))) / Math.PI;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(width, height);
+        }
+
+        createMeshItems() {
+            this.meshItems = [];
+            for (const img of this.images) {
+                const meshItem = new MeshItem(img, this.scene);
+                this.meshItems.push(meshItem);
+            }
+        }
+
+        render(velocity: number) {
+            for (let i = 0; i < this.meshItems.length; i++) {
+                this.meshItems[i].render(velocity);
+            }
+            this.renderer.render(this.scene, this.camera);
+        }
+
+        destroy() {
+            for (const item of this.meshItems) item.destroy();
+            this.meshItems = [];
+            if (this.renderer) {
+                this.renderer.dispose();
+                const canvas = this.renderer.domElement as HTMLCanvasElement;
+                if (canvas && canvas.parentElement) canvas.parentElement.removeChild(canvas);
+            }
+            this.scene = null;
+            this.camera = null;
+            this.renderer = null;
+        }
+
+        
+    }
+
+    class MeshItem {
+        element: HTMLImageElement;
+        scene: any;
+        geometry: any;
+        material: any;
+        mesh: any;
+        imageTexture: any;
+        uniforms: any;
+        offset = new THREE.Vector2(0, 0);
+        sizes = new THREE.Vector2(0, 0);
+
+        constructor(element: HTMLImageElement, scene: any) {
+            this.element = element;
+            this.scene = scene;
+            this.createMesh();
+        }
+
+        getDimensions() {
+            const { width, height, top, left } = this.element.getBoundingClientRect();
+            this.sizes.set(width, height);
+            this.offset.set(
+                left - window.innerWidth / 2 + width / 2,
+                -top + window.innerHeight / 2 - height / 2
+            );
+        }
+
+        createMesh() {
+            this.geometry = new THREE.PlaneGeometry(1, 1, 64, 64);
+            this.imageTexture = new THREE.TextureLoader().load(this.element.src);
+            this.imageTexture.minFilter = THREE.LinearFilter;
+            this.imageTexture.magFilter = THREE.LinearFilter;
+            this.uniforms = {
+                uTexture: { value: this.imageTexture },
+                uOffset: { value: new THREE.Vector2(0.0, 0.0) },
+                uAlpha: { value: 1.0 }
+            };
+            this.material = new THREE.ShaderMaterial({
+                uniforms: this.uniforms,
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+            this.mesh = new THREE.Mesh(this.geometry, this.material);
+            this.getDimensions();
+            this.mesh.position.set(this.offset.x, this.offset.y, 0);
+            this.mesh.scale.set(this.sizes.x, this.sizes.y, 1);
+            this.scene.add(this.mesh);
+        }
+
+        render(velocity: number) {
+            this.getDimensions();
+            this.mesh.position.set(this.offset.x, this.offset.y, 0);
+            this.mesh.scale.set(this.sizes.x, this.sizes.y, 1);
+            // Couple scroll velocity to shader offset; tune multiplier for desired intensity
+            const yOffset = -velocity * 0.0025;
+            this.uniforms.uOffset.value.set(0.0, yOffset);
+        }
+
+        destroy() {
+            if (this.mesh) this.scene.remove(this.mesh);
+            if (this.geometry) this.geometry.dispose();
+            if (this.material) this.material.dispose();
+            if (this.imageTexture) this.imageTexture.dispose();
+        }
+    }
 </script>
