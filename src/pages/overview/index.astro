@@ -1,0 +1,162 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NavBar from '../../components/NavBar.astro';
+import TransitionPage from '../../components/animation/TransitionPage.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+const photos: CollectionEntry<'photos'>[] = await getCollection('photos');
+const sortedPhotos = photos.sort((a, b) => a.data.category.localeCompare(b.data.category));
+
+const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
+---
+
+<Layout title="Overview" color="bg-creme">
+    <TransitionPage title="Overview" color="bg-orange" textColor="text-creme">
+        <NavBar color="text-orange" />
+        
+        <div class="infinite-scroll-wrapper relative overflow-hidden">
+            <div class="grid grid-cols-4 gap-x-16 gap-y-16 infinite-scroll-container p-16">
+                {duplicatedPhotos.map((photo, index) => (
+                    <div 
+                        class={`max-w-full h-auto block justify-center items-center transform ${
+                            index % 4 === 0 ? 'translate-x-2 translate-y-2' :
+                            index % 4 === 1 ? '-translate-x-2 -translate-y-2 ' :
+                            index % 4 === 2 ? 'translate-x-2 translate-y-2' :
+                            '-translate-x-2 -translate-y-2'
+                        }`}
+                        data-index={index}
+                    >
+                        <div id={`scroll-distortion-${index}`} class="relative overflow-hidden group">
+                            <div class={`scroll-distortion-plane-${index}`}>
+                                <a href={`/category/${photo.data.category}/${photo.data.id}`} class="block relative">
+                                    <img 
+                                        src={photo.data.image} 
+                                        alt={photo.data.title}
+                                        loading="lazy"
+                                        class="w-full h-auto transition-transform group-hover:translate-x-full scroll-translate-img"
+                                    />
+                                    <div class="absolute inset-0 flex items-center justify-center duration-500 -translate-x-full group-hover:translate-x-0">
+                                        <h3 class="font-titleita text-orange text-xl font-semibold text-center px-4">
+                                            {photo.data.title}
+                                        </h3>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </TransitionPage>
+</Layout>
+
+<script>
+    import Lenis from 'lenis';
+
+    let lenis: Lenis;
+    let effectCanvas: any = null;
+    let scrollVelocity = 0;
+    let scrollTimeout: ReturnType<typeof setTimeout>;
+    let isScrolling = false;
+
+    function initInfiniteScroll() {
+        if (lenis) {
+            lenis.destroy();
+        }
+
+        if (effectCanvas) {
+            effectCanvas.destroy();
+            effectCanvas = null;
+        }
+
+        lenis = new Lenis({
+            duration: 0.9,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            gestureOrientation: 'vertical',
+            smoothWheel: true,
+            wheelMultiplier: 0.8,
+            touchMultiplier: 1.5,
+            infinite: true
+        });
+
+        lenis.on('scroll', (e: any) => {
+            scrollVelocity = e.velocity || 0;
+            
+            const images = document.querySelectorAll('.infinite-scroll-container img');
+            images.forEach((img: any) => {
+                const translateY = Math.min(Math.abs(scrollVelocity) * 3, 15);
+                // Store the scroll translateY value as a CSS custom property
+                img.style.setProperty('--scroll-translate-y', `${scrollVelocity > 0 ? translateY : -translateY}px`);
+            });
+            
+            isScrolling = true;
+            clearTimeout(scrollTimeout);
+            
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+                const images = document.querySelectorAll('.infinite-scroll-container img');
+                images.forEach((img: any) => {
+                    // Reset the scroll translateY value
+                    img.style.setProperty('--scroll-translate-y', '0px');
+                });
+            }, 150);
+        });
+
+        const wrapper = document.querySelector('.infinite-scroll-wrapper') as HTMLElement;
+        const container = document.querySelector('.infinite-scroll-container') as HTMLElement;
+        
+        if (!wrapper || !container) return;
+      
+
+        function raf(time: number) {
+            lenis.raf(time);
+            if (effectCanvas) effectCanvas.render(scrollVelocity);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+    }
+
+    document.addEventListener('astro:page-load', initInfiniteScroll);
+    
+    document.addEventListener('astro:before-preparation', () => {
+        if (lenis) {
+            lenis.destroy();
+        }
+        if (effectCanvas) {
+            effectCanvas.destroy();
+            effectCanvas = null;
+        }
+        clearTimeout(scrollTimeout);
+    });
+
+    let resizeTimeout: ReturnType<typeof setTimeout>;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (lenis) {
+                lenis.resize();
+            }
+            if (effectCanvas) {
+                effectCanvas.onWindowResize();
+            }
+        }, 250);
+    });
+</script>
+
+<style>
+    .scroll-translate-img {
+        --scroll-translate-y: 0px;
+        transform: translateY(var(--scroll-translate-y));
+        transition: transform 0.4s ease-out;
+    }
+    
+    .scroll-translate-img:hover {
+        transform: translateX(100%) translateY(var(--scroll-translate-y));
+    }
+    
+    /* Smooth transition when scroll stops */
+    .scroll-translate-img:not(:hover) {
+        transition: transform 0.4s ease-out;
+    }
+</style>
