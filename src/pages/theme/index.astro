@@ -50,7 +50,6 @@ const photosByCategory = photos.reduce((acc, category) => {
 
 <script>
     import { LiquidShader } from '../../components/animation/LiquidShader';
-    console.log('LiquidShader loaded');
 
     document.addEventListener('astro:page-load', () => {
         document.querySelectorAll('[id^="canvas-"]').forEach(canvas => {
