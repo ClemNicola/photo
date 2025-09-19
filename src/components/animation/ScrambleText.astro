@@ -34,6 +34,8 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
 <script>
   import SplitType from 'split-type';
   import gsap from 'gsap';
+  import { hasTextAnimated } from '../../stores/animationStore';
+
   class TextAnimator {
     private element: HTMLElement;
     private originalText: string;
@@ -46,6 +48,19 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
       this.element = element;
       this.originalText = element.dataset.originalText || element.innerText;
       this.splitText = new SplitType(element);
+    }
+
+    applyFinalClasses() {
+      if (!this.splitText?.chars) return;
+      
+      this.splitText.chars.forEach((char) => {
+        char.classList.remove('font-loading');
+        if (char.closest('.special')) {
+          char.classList.add('font-titleita');
+        } else {
+          char.classList.add('font-custom');
+        }
+      });
     }
 
     async animate(duration = 3000) {
@@ -91,57 +106,72 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
         ease: 'power2.out',
         delay: 0.5,
         onStart: () => {
-          if (this.splitText?.chars) {
-            this.splitText.chars.forEach((char) => {
-              char.classList.remove('font-loading');
-
-              if (char.closest('.special')) {
-                char.classList.add('font-titleita');
-              } else {
-                char.classList.add('font-custom');
-              }
-            });
-          }
+          this.applyFinalClasses();
         },
       });
     }
+
     cleanup() {
       this.scramblesIntervals.forEach((interval) => clearInterval(interval));
     }
   }
 
+  function applyFinalFontClasses() {
+    const elements = document.querySelectorAll('.animated-text');
+    elements.forEach((element) => {
+      if (element instanceof HTMLElement) {
+        element.classList.remove('font-loading');
+        if (element.closest('.special')) {
+          element.classList.add('font-titleita');
+        } else {
+          element.classList.add('font-custom');
+        }
+        
+        // Appliquer aussi aux chars si elles existent
+        const chars = element.querySelectorAll('.char');
+        chars.forEach((char) => {
+          if (char instanceof HTMLElement) {
+            char.classList.remove('font-loading');
+            if (char.closest('.special')) {
+              char.classList.add('font-titleita');
+            } else {
+              char.classList.add('font-custom');
+            }
+          }
+        });
+      }
+    });
+  }
+
   function initializeAnimations() {
     const elements = document.querySelectorAll('.animated-text');
-    const hasAnimated = localStorage.getItem('textAnimationsDone') === 'true';
+    console.log('hasTextAnimated:', hasTextAnimated.get());
 
-    if (hasAnimated) {
-      elements.forEach((element) => {
-        if (element instanceof HTMLElement) {
-          element.classList.remove('font-loading');
-          if (element.closest('.special')) {
-            element.classList.add('font-titleita');
-          } else {
-            element.classList.add('font-custom');
-          }
-        }
-      });
+    // Si l'animation a déjà été jouée, appliquer directement les classes finales
+    if (hasTextAnimated.get()) {
+      applyFinalFontClasses();
       return;
     }
 
+    // Sinon, lancer l'animation
     const animators = Array.from(elements).map((element) => {
       if (element instanceof HTMLElement) {
         return new TextAnimator(element);
       }
     });
 
-    const startAnim = () => {
-      animators.forEach((anim) => {
-        if (anim) {
-          anim.animate().then(() => {
-            localStorage.setItem('textAnimationsDone', 'true');
-          });
-        }
-      });
+    const startAnim = async () => {
+      console.log('Starting animations for', animators.length, 'elements');
+      
+      const promises = animators
+        .filter((anim) => anim !== undefined)
+        .map((anim) => anim!.animate());
+      
+      await Promise.all(promises);
+      
+      // Marquer l'animation comme terminée
+      hasTextAnimated.set(true);
+      console.log('All animations completed, store updated');
     };
 
     let imagesLoaded = false;
@@ -149,21 +179,27 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
 
     setTimeout(() => {
       timeoutReached = true;
-      if (imagesLoaded) startAnim();
+      if (imagesLoaded) {
+        startAnim().catch(console.error);
+      }
     }, 0);
 
     window.addEventListener('load', () => {
       console.log('Window loaded');
       imagesLoaded = true;
-      if (timeoutReached) startAnim();
+      if (timeoutReached) {
+        startAnim().catch(console.error);
+      }
     });
   }
 
+  // Initialize on DOMContentLoaded
   document.addEventListener('DOMContentLoaded', () => {
     initializeAnimations();
   });
 
-  window.addEventListener('beforeunload', () => {
-    localStorage.removeItem('textAnimationsDone');
+  // Also initialize on Astro page load (for SPA navigation)
+  document.addEventListener('astro:page-load', () => {
+    initializeAnimations();
   });
 </script>
