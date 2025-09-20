@@ -64,7 +64,10 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
     }
 
     async animate(duration = 3000) {
-      if (!this.splitText?.chars) return;
+      if (!this.splitText?.chars) {
+        console.error('❌ No chars found in splitText for:', this.originalText);
+        return;
+      }
       const scrambleDuration = duration - 300;
 
       gsap.set(this.splitText.chars, {
@@ -145,61 +148,53 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
 
   function initializeAnimations() {
     const elements = document.querySelectorAll('.animated-text');
-    console.log('hasTextAnimated:', hasTextAnimated.get());
-
-    // Si l'animation a déjà été jouée, appliquer directement les classes finales
     if (hasTextAnimated.get()) {
+      console.log('Animation already played, applying final classes only');
       applyFinalFontClasses();
       return;
     }
 
-    // Sinon, lancer l'animation
-    const animators = Array.from(elements).map((element) => {
+
+    if (elements.length === 0) {
+      console.warn('⚠️ No animated-text elements found!');
+      return;
+    }
+
+    // Créer les animators
+    const animators = Array.from(elements).map((element, index) => {
       if (element instanceof HTMLElement) {
         return new TextAnimator(element);
       }
+      console.warn(`⚠️ Element ${index + 1} is not HTMLElement:`, element);
+      return undefined;
     });
 
-    const startAnim = async () => {
-      console.log('Starting animations for', animators.length, 'elements');
-      
-      const promises = animators
-        .filter((anim) => anim !== undefined)
-        .map((anim) => anim!.animate());
-      
-      await Promise.all(promises);
-      
-      // Marquer l'animation comme terminée
-      hasTextAnimated.set(true);
-      console.log('All animations completed, store updated');
+    const validAnimators = animators.filter((anim) => anim !== undefined);
+
+    const startAnim = async () => { 
+      try {
+        const promises = validAnimators.map((anim, index) => {
+          return anim!.animate();
+        });
+        
+        await Promise.all(promises);
+        
+        // Marquer l'animation comme terminée
+        hasTextAnimated.set(true);
+      } catch (error) {
+        console.error('❌ Animation error:', error);
+      }
     };
 
-    let imagesLoaded = false;
-    let timeoutReached = false;
-
     setTimeout(() => {
-      timeoutReached = true;
-      if (imagesLoaded) {
-        startAnim().catch(console.error);
-      }
-    }, 0);
-
-    window.addEventListener('load', () => {
-      console.log('Window loaded');
-      imagesLoaded = true;
-      if (timeoutReached) {
-        startAnim().catch(console.error);
-      }
-    });
+      startAnim().catch(console.error);
+    }, 100);
   }
 
-  // Initialize on DOMContentLoaded
-  document.addEventListener('DOMContentLoaded', () => {
-    initializeAnimations();
-  });
 
   // Also initialize on Astro page load (for SPA navigation)
   document.addEventListener('astro:page-load', () => {
+    console.log('🌟 astro:page-load event fired');
     initializeAnimations();
   });
 </script>
