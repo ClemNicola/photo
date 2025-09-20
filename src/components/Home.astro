@@ -14,38 +14,44 @@ const am = dayjs(date).format('A');
 ---
 
 <>
-  <div class="h-screen flex flex-col justify-between">
-    <div class="flex gap-4 py-4 justify-end font-custom text-orange text-lg">
-      <a href="/overview" class="cursor-pointer relative after:bg-light-orange after:absolute after:h-[2px] after:w-0 after:bottom-0 after:left-0 hover:after:w-full after:transition-all after:duration-300"><ScrambleText text="Overview" delay={0} /></a>
-      <a href="/theme" class="cursor-pointer relative after:bg-light-orange after:absolute after:h-[2px] after:w-0 after:bottom-0 after:left-0 hover:after:w-full after:transition-all after:duration-300"><ScrambleText text="Theme" delay={0} /></a>
+  <div class="min-h-screen flex flex-col justify-between px-4 xs:px-6 sm:px-8 md:px-12 lg:px-16">
+    {/* Top navigation */}
+    <div class="flex gap-3 xs:gap-4 sm:gap-6 py-4 xs:py-6 justify-end font-custom text-orange text-sm xs:text-base sm:text-lg">
+      <a href="/overview" class="cursor-pointer relative after:bg-light-orange after:absolute after:h-[2px] after:w-0 after:bottom-0 after:left-0 hover:after:w-full after:transition-all after:duration-300 touch-manipulation">
+        <ScrambleText text="Overview" delay={0} />
+      </a>
+      <a href="/theme" class="cursor-pointer relative after:bg-light-orange after:absolute after:h-[2px] after:w-0 after:bottom-0 after:left-0 hover:after:w-full after:transition-all after:duration-300 touch-manipulation">
+        <ScrambleText text="Theme" delay={0} />
+      </a>
     </div>
-    <div class="flex flex-col gap-2 items-center">
-      <div class="flex flex-col text-orange font-titleita special">
-        <div class="flex gap-8">
-          <ScrambleText text="Clément" delay={0} className="text-9xl" />
-          <ScrambleText text="Nicolas" delay={0} className="text-9xl" />
+    {/* Centered title */}
+    <div class="flex flex-col gap-3 xs:gap-4 items-center px-2">
+      <div class="flex flex-col text-orange font-titleita special items-center text-center">
+        <div class="flex flex-row gap-2 xs:gap-3 sm:gap-6 md:gap-8 items-center">
+          <ScrambleText text="Clément" delay={0} className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl leading-none" />
+          <ScrambleText text="Nicolas" delay={0} className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl leading-none" />
         </div>
-        <ScrambleText text="Photographies" delay={0} className="text-7xl" />
+        <ScrambleText text="Photographies" delay={0} className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl leading-tight mt-1 xs:mt-2" />
       </div>
     </div>
-    <div class="flex justify-between items-end text-custom py-4 text-orange">
-      <div class="flex gap-1">
-        <ScrambleText text=`${day}` delay={0} className="text-lg" />
-        <ScrambleText text=`${month}` delay={0} className="text-lg" />
-        <ScrambleText text=`${num}` delay={0} className="text-lg" />
-        <ScrambleText text=`${year}` delay={0} className="text-lg" />
-        <ScrambleText text=`${hours}` delay={0} className="text-lg" />
-        <ScrambleText text=`${am}` delay={0} className="text-lg" />
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end text-custom py-4 xs:py-6 text-orange gap-4 sm:gap-6">
+      <div class="flex flex-wrap gap-1 xs:gap-2 text-center sm:text-left">
+        <ScrambleText text=`${day}` delay={0} className="text-sm xs:text-base sm:text-lg" />
+        <ScrambleText text=`${month}` delay={0} className="text-sm xs:text-base sm:text-lg" />
+        <ScrambleText text=`${num}` delay={0} className="text-sm xs:text-base sm:text-lg" />
+        <ScrambleText text=`${year}` delay={0} className="text-sm xs:text-base sm:text-lg" />
+        <ScrambleText text=`${hours}` delay={0} className="text-sm xs:text-base sm:text-lg" />
+        <ScrambleText text=`${am}` delay={0} className="text-sm xs:text-base sm:text-lg" />
       </div>
       <CounterAnimation
         counter={0}
         maxCounter={100}
         seconds={2.7}
-        className="font-title text-7xl"
+        className="font-title text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl self-center sm:self-end"
       />
     </div>
   </div>
-  <section class="pt-24 flex flex-col gap-14 items-center">
+  <section class="pt-8 xs:pt-12 sm:pt-16 md:pt-20 pb-8 xs:pb-12 flex flex-col gap-6 xs:gap-8 sm:gap-10 md:gap-12 lg:gap-14 items-center w-full max-w-6xl mx-auto px-4 xs:px-6 sm:px-8">
     <PhotoCard category="Lost in South" />
     <PhotoCard category="Cold" />
     <PhotoCard category="Strange Cities" />

@@ -17,19 +17,33 @@ const photosByCategory = photos.reduce((acc, category) => {
 <Layout title="Themes" color="bg-orange">
     <TransitionPage title="Themes" color="bg-creme" textColor="text-orange">
         <NavBar color="text-creme" />
-            <div class="flex flex-col gap-4 h-[calc(100svh-80px)] items-center justify-center">
+            <div class="flex flex-col gap-4 min-h-[calc(100svh-80px)] items-center justify-center w-full px-2 sm:px-4">
                 {categories.map(category => {
                     const uniqueId = Math.random().toString(36).substring(7);
                     return (
-                        <div class="flex items-center gap-2 group">
+                        <div class="flex items-center gap-2 group w-full max-w-3xl sm:max-w-4xl md:max-w-5xl justify-center">
                             <a 
                                 href={`/category/${category.data.category}`}
-                                class="text-8xl font-title text-creme relative z-10 px-8 py-4 transition-all duration-300 translate-x-[7%] group-hover:translate-x-[0]"
+                                class="
+                                    font-title text-creme relative z-10
+                                    px-4 py-2 sm:px-8 sm:py-4
+                                    transition-all duration-300
+                                    lg:translate-x-[7%] lg:group-hover:translate-x-0
+                                    text-4xl sm:text-6xl md:text-7xl lg:text-8xl
+                                    w-fit
+                                "
                             >
                                 {category.data.category}
                             </a>
                             {photosByCategory[category.data.category] && photosByCategory[category.data.category].length > 0 && (
-                                <div class="relative w-[200px] h-[125px]">
+                                <div class="
+                                    relative
+                                    w-[110px] h-[70px]
+                                    xs:w-[140px] xs:h-[90px]
+                                    sm:w-[180px] sm:h-[110px]
+                                    md:w-[200px] md:h-[125px]
+                                    flex-shrink-0
+                                ">
                                     <div id={`canvas-${uniqueId}`} class="absolute inset-0 h-full w-full">
                                         <div class={`liquide-plane-${uniqueId} w-full h-full`}>
                                             <img 

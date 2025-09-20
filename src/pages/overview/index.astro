@@ -15,15 +15,48 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...
         <NavBar color="text-orange" />
         
         <div class="infinite-scroll-wrapper relative overflow-hidden">
-            <div class="grid grid-cols-4 gap-x-16 gap-y-16 infinite-scroll-container p-16">
+            <div 
+                class="
+                    grid 
+                    grid-cols-2 
+                    sm:grid-cols-2 
+                    md:grid-cols-3 
+                    lg:grid-cols-4 
+                    xl:grid-cols-5
+                    gap-x-2 
+                    gap-y-4 
+                    xs:gap-x-3 
+                    xs:gap-y-5
+                    sm:gap-x-6 
+                    sm:gap-y-8 
+                    md:gap-x-8 
+                    md:gap-y-10 
+                    lg:gap-x-12 
+                    lg:gap-y-12 
+                    infinite-scroll-container 
+                    p-2 
+                    xs:p-3
+                    sm:p-6 
+                    md:p-8 
+                    lg:p-12
+                "
+            >
                 {duplicatedPhotos.map((photo, index) => (
                     <div 
-                        class={`max-w-full h-auto block justify-center items-center transform ${
-                            index % 4 === 0 ? 'translate-x-2 translate-y-2' :
-                            index % 4 === 1 ? '-translate-x-2 -translate-y-2 ' :
-                            index % 4 === 2 ? 'translate-x-2 translate-y-2' :
-                            '-translate-x-2 -translate-y-2'
-                        }`}
+                        class={`
+                            max-w-full 
+                            h-auto 
+                            block 
+                            justify-center 
+                            items-center 
+                            transform
+                            ${
+                                index % 4 === 0 ? 'translate-x-0.5 translate-y-0.5 sm:translate-x-1 sm:translate-y-1 md:translate-x-2 md:translate-y-2' :
+                                index % 4 === 1 ? '-translate-x-0.5 -translate-y-0.5 sm:-translate-x-1 sm:-translate-y-1 md:-translate-x-2 md:-translate-y-2' :
+                                index % 4 === 2 ? 'translate-x-0.5 translate-y-0.5 sm:translate-x-1 sm:translate-y-1 md:translate-x-2 md:translate-y-2' :
+                                '-translate-x-0.5 -translate-y-0.5 sm:-translate-x-1 sm:-translate-y-1 md:-translate-x-2 md:-translate-y-2'
+                            }
+                        `}
                         data-index={index}
                     >
                         <div id={`scroll-distortion-${index}`} class="relative overflow-hidden group">
@@ -33,10 +66,50 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...
                                         src={photo.data.image} 
                                         alt={photo.data.title}
                                         loading="lazy"
-                                        class="w-full h-auto transition-transform group-hover:translate-x-full scroll-translate-img"
+                                        class="
+                                            w-full 
+                                            h-auto 
+                                            aspect-[3/4] 
+                                            object-cover 
+                                            transition-transform 
+                                            duration-500
+                                            group-hover:translate-x-full 
+                                            scroll-translate-img
+                                            min-h-[140px]
+                                            xs:min-h-[160px]
+                                            sm:min-h-[180px]
+                                            md:min-h-[200px]
+                                            lg:min-h-[240px]
+                                            xl:min-h-[220px]
+                                        "
                                     />
-                                    <div class="absolute inset-0 flex items-center justify-center duration-500 -translate-x-full group-hover:translate-x-0">
-                                        <h3 class="font-titleita text-orange text-xl font-semibold text-center px-4">
+                                    <div class="
+                                        absolute 
+                                        inset-0 
+                                        flex 
+                                        items-center 
+                                        justify-center 
+                                        transition-transform
+                                        duration-500 
+                                        -translate-x-full 
+                                        group-hover:translate-x-0
+                                        bg-creme/90
+                                        backdrop-blur-sm
+                                    ">
+                                        <h3 class="
+                                            font-titleita 
+                                            text-orange 
+                                            text-xs
+                                            xs:text-sm 
+                                            sm:text-base 
+                                            md:text-lg 
+                                            font-semibold 
+                                            text-center 
+                                            px-1
+                                            xs:px-2 
+                                            sm:px-3
+                                            leading-tight
+                                        ">
                                             {photo.data.title}
                                         </h3>
                                     </div>
@@ -85,7 +158,10 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...
             
             const images = document.querySelectorAll('.infinite-scroll-container img');
             images.forEach((img: any) => {
-                const translateY = Math.min(Math.abs(scrollVelocity) * 3, 15);
+                const isMobile = window.innerWidth < 768;
+                const multiplier = isMobile ? 2 : 3;
+                const maxTranslate = isMobile ? 10 : 15;
+                const translateY = Math.min(Math.abs(scrollVelocity) * multiplier, maxTranslate);
                 // Store the scroll translateY value as a CSS custom property
                 img.style.setProperty('--scroll-translate-y', `${scrollVelocity > 0 ? translateY : -translateY}px`);
             });
@@ -155,8 +231,19 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...
         transition: transform 0.4s ease-out;
     }
     
-    .scroll-translate-img:hover {
-        transform: translateX(100%) translateY(var(--scroll-translate-y));
+    @media (hover: hover) {
+        .scroll-translate-img:hover {
+            transform: translateX(100%) translateY(var(--scroll-translate-y));
+        }
+    }
+    
+    @media (hover: none) {
+        .group:active .scroll-translate-img {
+            transform: translateX(100%) translateY(var(--scroll-translate-y));
+        }
+        .group:active .absolute {
+            transform: translateX(0) !important;
+        }
     }
     
     /* Smooth transition when scroll stops */

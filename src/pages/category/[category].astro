@@ -28,24 +28,24 @@ let date = new Date();
   <TransitionPage title={category}>
     <NavBar color="text-orange" />
 
-    <div class="py-4 grid grid-cols-3 gap-x-32 gap-y-16">
+    <div class="py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-x-32 lg:gap-y-16">
     {filteredPhotos.map((photo, index) => (
       <div class={`flex flex-col gap-2 justify-center items-center transform ${
-        index % 4 === 0 ? 'translate-x-2 translate-y-2' :
-        index % 4 === 1 ? '-translate-x-2 -translate-y-2 ' :
-        index % 4 === 2 ? 'translate-x-2 translate-y-2' :
-        '-translate-x-2 -translate-y-2'
+        index % 4 === 0 ? 'translate-x-1 translate-y-1 sm:translate-x-2 sm:translate-y-2' :
+        index % 4 === 1 ? '-translate-x-1 -translate-y-1 sm:-translate-x-2 sm:-translate-y-2' :
+        index % 4 === 2 ? 'translate-x-1 translate-y-1 sm:translate-x-2 sm:translate-y-2' :
+        '-translate-x-1 -translate-y-1 sm:-translate-x-2 sm:-translate-y-2'
       }`}>
         <a href={`/category/${photo.data.category}/${photo.data.id}`}>
-          <img src={photo.data.image} alt={photo.data.title} class="shader-image"/>
+          <img src={photo.data.image} alt={photo.data.title} class="shader-image w-full h-auto max-w-xs sm:max-w-sm"/>
         </a>
-        <p class="text-orange font-title text-2xl font-black">{photo.data.id}</p>
+        <p class="text-orange font-title text-lg sm:text-xl lg:text-2xl font-black">{photo.data.id}</p>
       </div>
     ))}
   </div>
-  <div class="flex justify-between items-center py-4 font-custom font-normal text-custom-black">
-    <p class="text-lg">{dayjs(date).format('ddd, MMM DD, YYYY HH:mm A')}</p>
-    <p class="text-xl">{category}</p>
+  <div class="flex flex-row px-4 sm:px-0 justify-between items-start sm:items-center py-4 font-custom font-normal text-custom-black gap-2 sm:gap-0">
+    <p class="text-sm sm:text-base lg:text-lg">{dayjs(date).format('ddd, MMM DD, YYYY HH:mm A')}</p>
+    <p class="text-base sm:text-lg lg:text-xl">{category}</p>
   </div>
   </TransitionPage>
 </Layout>

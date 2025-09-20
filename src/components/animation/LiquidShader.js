@@ -45,6 +45,9 @@ export class LiquidShader {
         const computedStyle = window.getComputedStyle(this.planeElement);
         const clipPath = computedStyle.clipPath;
 
+        // Détecter si on est sur mobile
+        const isMobile = window.innerWidth < 1024 || 'ontouchstart' in window;
+
         Object.assign(this.curtains.canvas.style, {
           position: 'absolute',
           top: '0',
@@ -52,7 +55,11 @@ export class LiquidShader {
           width: '100%',
           height: '100%',
           zIndex: '1',
-          clipPath: clipPath !== 'none' ? clipPath : 'inset(0 100% 0 0)',
+          clipPath: isMobile
+            ? 'inset(0 0 0 0)'
+            : clipPath !== 'none'
+              ? clipPath
+              : 'inset(0 100% 0 0)',
           transition: 'clip-path 300ms ease-in-out',
         });
 
@@ -73,13 +80,16 @@ export class LiquidShader {
             subtree: true,
           });
 
-          groupElement.addEventListener('mouseenter', () => {
-            this.curtains.canvas.style.clipPath = 'inset(0 0 0 0)';
-          });
+          // Événements seulement sur desktop
+          if (!isMobile) {
+            groupElement.addEventListener('mouseenter', () => {
+              this.curtains.canvas.style.clipPath = 'inset(0 0 0 0)';
+            });
 
-          groupElement.addEventListener('mouseleave', () => {
-            this.curtains.canvas.style.clipPath = 'inset(0 100% 0 0)';
-          });
+            groupElement.addEventListener('mouseleave', () => {
+              this.curtains.canvas.style.clipPath = 'inset(0 100% 0 0)';
+            });
+          }
         }
       }
     });

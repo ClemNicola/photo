@@ -38,21 +38,21 @@ const colorChange = (title: string) => {
 <Layout title={photo.data.title} color="bg-creme">
     <TransitionPage title={photo.data.title}>
         <NavBar color="text-orange" />
-        <div class="p-4 flex items-center justify-center h-[calc(100svh-80px)]">
+        <div class="p-2 sm:p-4 flex items-center justify-center h-[calc(100svh-80px)]">
             <div class="relative max-w-5xl w-full">
                 <img src={photo.data.image} alt={photo.data.title} class="w-full h-auto object-cover"/>
-                <div class="absolute bottom-8 right-3 flex flex-col gap-4 backdrop-blur-[3px] p-6 min-w-[20em] bg-custom-black/10">
+                <div class="absolute bottom-1 right-1 sm:bottom-4 sm:right-2 flex flex-col gap-1 sm:gap-2 backdrop-blur-[2px] p-2 sm:p-3 min-w-[8em] sm:min-w-[12em] bg-custom-black/20">
                     <div class="hover-trigger">
-                        <ScrambleTextHover text={photo.data.title} className={`${colorChange(photo.data.title)} font-custom text-base font-medium`} />
+                        <ScrambleTextHover text={photo.data.title} className={`${colorChange(photo.data.title)} text-xs sm:text-sm`} />
                     </div>
                     <div class="hover-trigger">
-                        <ScrambleTextHover text={photo.data.category} className={`${colorChange(photo.data.title)} font-custom text-base font-medium`} />
+                        <ScrambleTextHover text={photo.data.category} className={`${colorChange(photo.data.title)} text-xs sm:text-sm`} />
                     </div>
                     <div class="hover-trigger">
-                        <ScrambleTextHover text={photo.data.place} className={`${colorChange(photo.data.title)} font-custom text-base font-medium`} />
+                        <ScrambleTextHover text={photo.data.place} className={`${colorChange(photo.data.title)} text-xs sm:text-sm`} />
                     </div>
                     <div class="hover-trigger">
-                        <ScrambleTextHover text={dayjs(photo.data.date).format('ddd, MMM DD, YYYY HH:mm A')} className={`${colorChange(photo.data.title)} `} />
+                        <ScrambleTextHover text={dayjs(photo.data.date).format('ddd, MMM DD, YYYY HH:mm A')} className={`${colorChange(photo.data.title)} text-[0.7em] sm:text-xs`} />
                     </div>
                 </div>
             </div>

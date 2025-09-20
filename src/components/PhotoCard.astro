@@ -17,27 +17,27 @@ const photos: CollectionEntry<'photos'>[] = await getCollection(
 
 {
   photos.map((photo) => (
-    <div class="flex flex-col gap-2">
-      <h2 class="font-titleita font-semi-bold text-5xl text-custom-black uppercase">{photo.data.category}</h2>
-      <div class="flex gap-4 items-end">
-        <div>
+    <div class="flex flex-col gap-1 sm:gap-2">
+      <h2 class="font-titleita font-semi-bold text-2xl sm:text-5xl text-custom-black uppercase">{photo.data.category}</h2>
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-end">
+        <div class="w-full sm:w-auto">
           <Image
             src={photo.data.image}
             alt={photo.data.title}
             width="700"
             height="1400"
-            class="object-cover shader-image"
+            class="object-cover shader-image w-full h-auto max-w-xs sm:max-w-none"
           />
         </div>
-        <div class="border-t-2 border-t-orange">
-          <div class="pt-2 flex justify-between items-center gap-12 cursor-pointer">
+        <div class="border-t-2 border-t-orange w-full sm:w-auto">
+          <div class="pt-2 flex justify-between items-center gap-4 sm:gap-12 cursor-pointer">
             <a href={`/category/${photo.data.category}`}
-              class="flex justify-between items-center gap-12 cursor-pointer"
+              class="flex justify-between items-center gap-4 sm:gap-12 cursor-pointer w-full sm:w-auto"
             >
-              <div class="min-w-36">
-                <ScrambleTextHover text="See More" className="font-custom text-2xl" />
+              <div class="min-w-20 sm:min-w-36">
+                <ScrambleTextHover text="See More" className="font-custom text-lg sm:text-2xl" />
               </div>
-              <Icon name="lucide:arrow-right" class="text-2xl" />
+              <Icon name="lucide:arrow-right" class="text-lg sm:text-2xl" />
             </a>
           </div>
         </div>
