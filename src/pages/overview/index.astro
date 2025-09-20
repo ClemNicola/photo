@@ -12,51 +12,17 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...
 
 <Layout title="Overview" color="bg-creme">
     <TransitionPage title="Overview" color="bg-orange" textColor="text-creme">
-        <NavBar color="text-orange" />
-        
+        <NavBar color="text-orange" /> 
         <div class="infinite-scroll-wrapper relative overflow-hidden">
-            <div 
-                class="
-                    grid 
-                    grid-cols-2 
-                    sm:grid-cols-2 
-                    md:grid-cols-3 
-                    lg:grid-cols-4 
-                    xl:grid-cols-5
-                    gap-x-2 
-                    gap-y-4 
-                    xs:gap-x-3 
-                    xs:gap-y-5
-                    sm:gap-x-6 
-                    sm:gap-y-8 
-                    md:gap-x-8 
-                    md:gap-y-10 
-                    lg:gap-x-12 
-                    lg:gap-y-12 
-                    infinite-scroll-container 
-                    p-2 
-                    xs:p-3
-                    sm:p-6 
-                    md:p-8 
-                    lg:p-12
-                "
-            >
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 lg:gap-x-16 lg:gap-y-16 infinite-scroll-container p-4 sm:p-8 lg:p-16">
                 {duplicatedPhotos.map((photo, index) => (
                     <div 
-                        class={`
-                            max-w-full 
-                            h-auto 
-                            block 
-                            justify-center 
-                            items-center 
-                            transform
-                            ${
-                                index % 4 === 0 ? 'translate-x-0.5 translate-y-0.5 sm:translate-x-1 sm:translate-y-1 md:translate-x-2 md:translate-y-2' :
-                                index % 4 === 1 ? '-translate-x-0.5 -translate-y-0.5 sm:-translate-x-1 sm:-translate-y-1 md:-translate-x-2 md:-translate-y-2' :
-                                index % 4 === 2 ? 'translate-x-0.5 translate-y-0.5 sm:translate-x-1 sm:translate-y-1 md:translate-x-2 md:translate-y-2' :
-                                '-translate-x-0.5 -translate-y-0.5 sm:-translate-x-1 sm:-translate-y-1 md:-translate-x-2 md:-translate-y-2'
-                            }
-                        `}
+                        class={`max-w-full h-auto block justify-center items-center transform ${
+                            index % 4 === 0 ? 'translate-x-1 translate-y-1 sm:translate-x-2 sm:translate-y-2' :
+                            index % 4 === 1 ? '-translate-x-1 -translate-y-1 sm:-translate-x-2 sm:-translate-y-2' :
+                            index % 4 === 2 ? 'translate-x-1 translate-y-1 sm:translate-x-2 sm:translate-y-2' :
+                            '-translate-x-1 -translate-y-1 sm:-translate-x-2 sm:-translate-y-2'
+                        }`}
                         data-index={index}
                     >
                         <div id={`scroll-distortion-${index}`} class="relative overflow-hidden group">
@@ -66,50 +32,10 @@ const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...
                                         src={photo.data.image} 
                                         alt={photo.data.title}
                                         loading="lazy"
-                                        class="
-                                            w-full 
-                                            h-auto 
-                                            aspect-[3/4] 
-                                            object-cover 
-                                            transition-transform 
-                                            duration-500
-                                            group-hover:translate-x-full 
-                                            scroll-translate-img
-                                            min-h-[140px]
-                                            xs:min-h-[160px]
-                                            sm:min-h-[180px]
-                                            md:min-h-[200px]
-                                            lg:min-h-[240px]
-                                            xl:min-h-[220px]
-                                        "
+                                        class="w-full h-auto transition-transform group-hover:translate-x-full scroll-translate-img"
                                     />
-                                    <div class="
-                                        absolute 
-                                        inset-0 
-                                        flex 
-                                        items-center 
-                                        justify-center 
-                                        transition-transform
-                                        duration-500 
-                                        -translate-x-full 
-                                        group-hover:translate-x-0
-                                        bg-creme/90
-                                        backdrop-blur-sm
-                                    ">
-                                        <h3 class="
-                                            font-titleita 
-                                            text-orange 
-                                            text-xs
-                                            xs:text-sm 
-                                            sm:text-base 
-                                            md:text-lg 
-                                            font-semibold 
-                                            text-center 
-                                            px-1
-                                            xs:px-2 
-                                            sm:px-3
-                                            leading-tight
-                                        ">
+                                    <div class="absolute inset-0 flex items-center justify-center duration-500 -translate-x-full group-hover:translate-x-0">
+                                        <h3 class="font-titleita text-orange text-sm sm:text-base lg:text-xl font-semibold text-center px-2 sm:px-4">
                                             {photo.data.title}
                                         </h3>
                                     </div>
