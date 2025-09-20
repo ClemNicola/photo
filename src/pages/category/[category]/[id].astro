@@ -43,16 +43,16 @@ const colorChange = (title: string) => {
                 <img src={photo.data.image} alt={photo.data.title} class="w-full h-auto object-cover"/>
                 <div class="absolute bottom-1 right-1 sm:bottom-4 sm:right-2 md:bottom-6 md:right-4 lg:bottom-8 lg:right-6 flex flex-col gap-0.5 sm:gap-2 md:gap-3 lg:gap-4 backdrop-blur-[2px] p-1.5 sm:p-3 md:p-4 lg:p-6 min-w-[6em] sm:min-w-[12em] md:min-w-[16em] lg:min-w-[20em] bg-custom-black/20">
                     <div class="hover-trigger">
-                        <ScrambleTextHover text={photo.data.title} className={`${colorChange(photo.data.title)} text-[0.6em] sm:text-sm md:text-base lg:text-lg`} />
+                        <ScrambleTextHover text={photo.data.title} className={`${colorChange(photo.data.title)} text-xs sm:text-sm md:text-base lg:text-lg`} />
                     </div>
                     <div class="hover-trigger">
-                        <ScrambleTextHover text={photo.data.category} className={`${colorChange(photo.data.title)} text-[0.6em] sm:text-sm md:text-base lg:text-lg`} />
+                        <ScrambleTextHover text={photo.data.category} className={`${colorChange(photo.data.title)} text-xs sm:text-sm md:text-base lg:text-lg`} />
                     </div>
                     <div class="hover-trigger">
-                        <ScrambleTextHover text={photo.data.place} className={`${colorChange(photo.data.title)} text-[0.6em] sm:text-sm md:text-base lg:text-lg`} />
+                        <ScrambleTextHover text={photo.data.place} className={`${colorChange(photo.data.title)} text-xs sm:text-sm md:text-base lg:text-lg`} />
                     </div>
                     <div class="hover-trigger">
-                        <ScrambleTextHover text={dayjs(photo.data.date).format('ddd, MMM DD, YYYY HH:mm A')} className={`${colorChange(photo.data.title)} text-[0.5em] sm:text-xs md:text-sm lg:text-base`} />
+                        <ScrambleTextHover text={dayjs(photo.data.date).format('ddd, MMM DD, YYYY HH:mm A')} className={`${colorChange(photo.data.title)} text-xs sm:text-xs md:text-sm lg:text-base`} />
                     </div>
                 </div>
             </div>
