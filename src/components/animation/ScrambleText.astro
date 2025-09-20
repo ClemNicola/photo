@@ -34,6 +34,8 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
 <script>
   import SplitType from 'split-type';
   import gsap from 'gsap';
+  import { hasTextAnimated } from '../../stores/animationStore';
+
   class TextAnimator {
     private element: HTMLElement;
     private originalText: string;
@@ -48,8 +50,24 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
       this.splitText = new SplitType(element);
     }
 
-    async animate(duration = 3000) {
+    applyFinalClasses() {
       if (!this.splitText?.chars) return;
+      
+      this.splitText.chars.forEach((char) => {
+        char.classList.remove('font-loading');
+        if (char.closest('.special')) {
+          char.classList.add('font-titleita');
+        } else {
+          char.classList.add('font-custom');
+        }
+      });
+    }
+
+    async animate(duration = 3000) {
+      if (!this.splitText?.chars) {
+        console.error('❌ No chars found in splitText for:', this.originalText);
+        return;
+      }
       const scrambleDuration = duration - 300;
 
       gsap.set(this.splitText.chars, {
@@ -91,79 +109,92 @@ const id = `scramble-${Math.random().toString(36).substring(2)}`;
         ease: 'power2.out',
         delay: 0.5,
         onStart: () => {
-          if (this.splitText?.chars) {
-            this.splitText.chars.forEach((char) => {
-              char.classList.remove('font-loading');
-
-              if (char.closest('.special')) {
-                char.classList.add('font-titleita');
-              } else {
-                char.classList.add('font-custom');
-              }
-            });
-          }
+          this.applyFinalClasses();
         },
       });
     }
+
     cleanup() {
       this.scramblesIntervals.forEach((interval) => clearInterval(interval));
     }
   }
 
-  function initializeAnimations() {
+  function applyFinalFontClasses() {
     const elements = document.querySelectorAll('.animated-text');
-    const hasAnimated = localStorage.getItem('textAnimationsDone') === 'true';
-
-    if (hasAnimated) {
-      elements.forEach((element) => {
-        if (element instanceof HTMLElement) {
-          element.classList.remove('font-loading');
-          if (element.closest('.special')) {
-            element.classList.add('font-titleita');
-          } else {
-            element.classList.add('font-custom');
-          }
-        }
-      });
-      return;
-    }
-
-    const animators = Array.from(elements).map((element) => {
+    elements.forEach((element) => {
       if (element instanceof HTMLElement) {
-        return new TextAnimator(element);
-      }
-    });
-
-    const startAnim = () => {
-      animators.forEach((anim) => {
-        if (anim) {
-          anim.animate().then(() => {
-            localStorage.setItem('textAnimationsDone', 'true');
-          });
+        element.classList.remove('font-loading');
+        if (element.closest('.special')) {
+          element.classList.add('font-titleita');
+        } else {
+          element.classList.add('font-custom');
         }
-      });
-    };
-
-    let imagesLoaded = false;
-    let timeoutReached = false;
-
-    setTimeout(() => {
-      timeoutReached = true;
-      if (imagesLoaded) startAnim();
-    }, 0);
-
-    window.addEventListener('load', () => {
-      console.log('Window loaded');
-      imagesLoaded = true;
-      if (timeoutReached) startAnim();
+        
+        // Appliquer aussi aux chars si elles existent
+        const chars = element.querySelectorAll('.char');
+        chars.forEach((char) => {
+          if (char instanceof HTMLElement) {
+            char.classList.remove('font-loading');
+            if (char.closest('.special')) {
+              char.classList.add('font-titleita');
+            } else {
+              char.classList.add('font-custom');
+            }
+          }
+        });
+      }
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initializeAnimations();
-  });
+  function initializeAnimations() {
+    const elements = document.querySelectorAll('.animated-text');
+    if (hasTextAnimated.get()) {
+      console.log('Animation already played, applying final classes only');
+      applyFinalFontClasses();
+      return;
+    }
 
-  window.addEventListener('beforeunload', () => {
-    localStorage.removeItem('textAnimationsDone');
+
+    if (elements.length === 0) {
+      console.warn('⚠️ No animated-text elements found!');
+      return;
+    }
+
+    // Créer les animators
+    const animators = Array.from(elements).map((element, index) => {
+      if (element instanceof HTMLElement) {
+        return new TextAnimator(element);
+      }
+      console.warn(`⚠️ Element ${index + 1} is not HTMLElement:`, element);
+      return undefined;
+    });
+
+    const validAnimators = animators.filter((anim) => anim !== undefined);
+
+    const startAnim = async () => { 
+      try {
+        const promises = validAnimators.map((anim, index) => {
+          return anim!.animate();
+        });
+        
+        await Promise.all(promises);
+        
+        // Marquer l'animation comme terminée
+        hasTextAnimated.set(true);
+      } catch (error) {
+        console.error('❌ Animation error:', error);
+      }
+    };
+
+    setTimeout(() => {
+      startAnim().catch(console.error);
+    }, 100);
+  }
+
+
+  // Also initialize on Astro page load (for SPA navigation)
+  document.addEventListener('astro:page-load', () => {
+    console.log('🌟 astro:page-load event fired');
+    initializeAnimations();
   });
 </script>

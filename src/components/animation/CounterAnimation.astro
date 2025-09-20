@@ -18,7 +18,16 @@
   {counter}
 </span>
 
+<style>
+  .counter-animation {
+    display: inline-block;
+  }
+</style>
+
 <script>
+  import gsap from 'gsap';
+  import { hasTextAnimated } from '../../stores/animationStore';
+
   class CounterAnimation {
     private element: HTMLElement
     private maxCounter: number
@@ -30,19 +39,31 @@
       this.element = element
       this.maxCounter = Number(element.dataset.maxCounter) || 100
       this.seconds = Number(element.dataset.seconds) || 4
-      this.startCounter()
     }
 
-    private startCounter(){
-        const intervalTime = (this.seconds * 1000) / this.maxCounter
-        this.interval = setInterval(() => {
-          this.counter++
-          this.element.textContent = this.counter.toString()
+    public async startCounter(){
+      const intervalTime = (this.seconds * 1000) / this.maxCounter
+      this.interval = setInterval(() => {
+        this.counter++
+        this.element.textContent = this.counter.toString()
 
-          if(this.counter >= this.maxCounter) {
-            if(this.interval) clearInterval(this.interval)
-          }
-        }, (intervalTime));
+        if(this.counter >= this.maxCounter) {
+          if(this.interval) clearInterval(this.interval)
+          // Animation de disparition vers le bas après un délai
+          setTimeout(() => {
+            this.animateOut()
+          }, 300)
+        }
+      }, (intervalTime));
+    }
+
+    private async animateOut() {
+      await gsap.to(this.element, {
+        opacity: 0,
+        y: '100%',
+        duration: 0.5,
+        ease: 'power2.in'
+      })
     }
 
     public stop(){
@@ -51,23 +72,40 @@
         this.element.textContent = this.maxCounter.toString()
       }
     }
+
+    public showFinal() {
+      this.element.textContent = this.maxCounter.toString()
+      gsap.set(this.element, { opacity: 0, y: '100%' })
+    }
   }
 
   function initializeCounter() {
     const counterElements = document.querySelectorAll('.counter-animation')
+    
+    
+    if (hasTextAnimated.get()) {
+      counterElements.forEach(element => {
+        if (element instanceof HTMLElement) {
+          const counter = new CounterAnimation(element)
+          counter.showFinal()
+        }
+      })
+      return
+    }
+
     const counters = Array.from(counterElements).map(element => {
       if(element instanceof HTMLElement){
-        return new CounterAnimation(element)
+        const counter = new CounterAnimation(element)
+        counter.startCounter()
+        return counter
       }
     })
 
     setTimeout(() => {
       counters.forEach(counter => counter?.stop());
-    }, 2700);
-
-    // window.addEventListener('load', () => {
-    //   counters.forEach((counter) => counter?.stop())
-    // })
+    }, 3000);
   }
-  document.addEventListener('astro:page-load', initializeCounter)
+  document.addEventListener('astro:page-load', () => {
+    initializeCounter();
+  });
 </script>
