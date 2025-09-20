@@ -1,0 +1,11 @@
+[[redirects]]
+  from = "http://www.cn-photography.fr/*"
+  to = "https://cn-photography.fr/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://cn-photography.fr/*"
+  to = "https://cn-photography.fr/:splat"
+  status = 301
+  force = true
