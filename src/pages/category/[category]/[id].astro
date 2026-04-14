@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import ScrambleTextHover from '../../../components/animation/ScrambleTextHover.astro';
 import TransitionPage from '../../../components/animation/TransitionPage.astro';
 import NavBar from '../../../components/NavBar.astro';
+import clsx from 'clsx';
 
 export async function getStaticPaths() {
     const photos: CollectionEntry<'photos'>[] = await getCollection('photos')
@@ -39,8 +40,8 @@ const colorChange = (title: string) => {
     <TransitionPage title={photo.data.title}>
         <NavBar color="text-orange" />
         <div class="p-2 sm:p-4 flex items-center justify-center h-[calc(100svh-80px)]">
-            <div class="relative max-w-5xl w-full">
-                <img src={photo.data.image} alt={photo.data.title} class="w-full h-auto object-cover"/>
+            <div class={clsx("relative", photo.data.title === 'Sunshine' ? 'w-fit mx-auto' : 'max-w-5xl w-full')}>
+                <img src={photo.data.image} alt={photo.data.title} class={clsx("object-cover", photo.data.title === 'Sunshine' ? 'h-[calc(100svh-120px)] w-auto' : 'w-full h-auto')}/>
                 <div class="absolute bottom-1 right-1 sm:bottom-4 sm:right-2 md:bottom-6 md:right-4 lg:bottom-8 lg:right-6 flex flex-col gap-0.5 sm:gap-2 md:gap-3 lg:gap-4 backdrop-blur-[2px] p-1.5 sm:p-3 md:p-4 lg:p-6 min-w-[6em] sm:min-w-[12em] md:min-w-[16em] lg:min-w-[20em] bg-custom-black/20">
                     <div class="hover-trigger">
                         <ScrambleTextHover text={photo.data.title} className={`${colorChange(photo.data.title)} text-xs sm:text-sm md:text-base lg:text-lg`} />

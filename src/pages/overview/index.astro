@@ -5,7 +5,9 @@ import TransitionPage from '../../components/animation/TransitionPage.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 const photos: CollectionEntry<'photos'>[] = await getCollection('photos');
-const sortedPhotos = photos.sort((a, b) => a.data.category.localeCompare(b.data.category));
+const excludeCategories = ['Pauline'];
+const filteredPhotos = photos.filter(photo => !excludeCategories.includes(photo.data.category));
+const sortedPhotos = filteredPhotos.sort((a, b) => a.data.category.localeCompare(b.data.category));
 
 const duplicatedPhotos = [...sortedPhotos, ...sortedPhotos, ...sortedPhotos, ...sortedPhotos];
 ---

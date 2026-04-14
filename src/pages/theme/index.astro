@@ -4,10 +4,13 @@ import NavBar from '../../components/NavBar.astro';
 import TransitionPage from '../../components/animation/TransitionPage.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
+const maskCategories = ['Pauline'];
 const categories: CollectionEntry<'categories'>[] = await getCollection('categories');
 const photos: CollectionEntry<'photos'>[] = await getCollection('photos')
 
-const photosByCategory = photos.reduce((acc, category) => {
+const filteredCategories = categories.filter(category => !maskCategories.includes(category.data.category));
+const paulinePhotos = photos.filter(photo => photo.data.category === 'Pauline');
+const photosByCategory = filteredCategories.reduce((acc, category) => {
     acc[category.data.category] = photos.filter(photo => photo.data.category === category.data.category)
     return acc
 }, {} as Record<string, CollectionEntry<'photos'>[]>)
@@ -18,10 +21,10 @@ const photosByCategory = photos.reduce((acc, category) => {
     <TransitionPage title="Themes" color="bg-creme" textColor="text-orange">
         <NavBar color="text-creme" />
             <div class="flex flex-col gap-4 min-h-[calc(100svh-80px)] items-center justify-center w-full px-2 sm:px-4">
-                {categories.map(category => {
+                {filteredCategories.map(category => {
                     const uniqueId = Math.random().toString(36).substring(7);
                     return (
-                        <div class="flex items-center gap-2 group w-full max-w-3xl sm:max-w-4xl md:max-w-5xl justify-center">
+                        <div data-category={category.data.category} class="flex items-center gap-2 group w-full max-w-3xl sm:max-w-4xl md:max-w-5xl justify-center">
                             <a 
                                 href={`/category/${category.data.category}`}
                                 class="
@@ -58,12 +61,95 @@ const photosByCategory = photos.reduce((acc, category) => {
                         </div>
                     );
                 })}
+
+                {paulinePhotos.length > 0 && (() => {
+                    const uniqueId = Math.random().toString(36).substring(7);
+                    return (
+                        <div data-category="Pauline" class="flex items-center gap-2 group w-full max-w-3xl sm:max-w-4xl md:max-w-5xl justify-center" style="opacity: 0;">
+                            <a 
+                                href="/category/Pauline"
+                                class="
+                                    font-title text-creme relative z-10
+                                    px-4 py-2 sm:px-8 sm:py-4
+                                    transition-all duration-300
+                                    lg:translate-x-[7%] lg:group-hover:translate-x-0
+                                    text-4xl sm:text-6xl md:text-7xl lg:text-8xl
+                                    w-fit
+                                "
+                            >
+                                Pauline
+                            </a>
+                            <div class="
+                                relative
+                                w-[110px] h-[70px]
+                                xs:w-[140px] xs:h-[90px]
+                                sm:w-[180px] sm:h-[110px]
+                                md:w-[200px] md:h-[125px]
+                                flex-shrink-0
+                            ">
+                                <div id={`canvas-${uniqueId}`} class="absolute inset-0 h-full w-full">
+                                    <div class={`liquide-plane-${uniqueId} w-full h-full`}>
+                                        <img 
+                                            src={paulinePhotos[Math.floor(Math.random() * paulinePhotos.length)].data.image} 
+                                            class="hidden"
+                                            crossorigin="anonymous"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()}
             </div>
     </TransitionPage>
 </Layout>
 
 <script>
     import { LiquidShader } from '../../components/animation/LiquidShader';
+    import gsap from 'gsap';
+
+    const SECRET = 'pauline';
+    let buffer = '';
+    let resetTimeout: ReturnType<typeof setTimeout>;
+
+    function onKeyDown(e: KeyboardEvent) {
+        if (e.key.length !== 1) return;
+
+        clearTimeout(resetTimeout);
+        buffer = (buffer + e.key.toLowerCase()).slice(-SECRET.length);
+        resetTimeout = setTimeout(() => { buffer = ''; }, 2000);
+
+        if (buffer !== SECRET) return;
+        buffer = '';
+        revealPauline();
+    }
+
+    function revealPauline() {
+        const others = document.querySelectorAll<HTMLElement>('[data-category]:not([data-category="Pauline"])');
+        const pauline = document.querySelector<HTMLElement>('[data-category="Pauline"]');
+        if (!pauline) return;
+
+        const tl = gsap.timeline();
+
+        tl.to(others, {
+            opacity: 0,
+            y: -20,
+            stagger: 0.05,
+            duration: 0.3,
+            ease: 'power2.in',
+            onComplete: () => others.forEach(el => el.style.display = 'none'),
+        });
+
+        tl.call(() => {
+            pauline.classList.remove('hidden');
+            pauline.style.display = '';
+        });
+
+        tl.fromTo(pauline,
+            { opacity: 0, scale: 0.9 },
+            { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' },
+        );
+    }
 
     document.addEventListener('astro:page-load', () => {
         document.querySelectorAll('[id^="canvas-"]').forEach(canvas => {
@@ -74,6 +160,14 @@ const photosByCategory = photos.reduce((acc, category) => {
                 document.querySelector(`.liquide-plane-${uniqueId} img`)
             );
         });
+
+        document.addEventListener('keydown', onKeyDown);
+    });
+
+    document.addEventListener('astro:before-preparation', () => {
+        document.removeEventListener('keydown', onKeyDown);
+        clearTimeout(resetTimeout);
+        buffer = '';
     });
 </script>
 
