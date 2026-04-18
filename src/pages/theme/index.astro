@@ -65,7 +65,7 @@ const photosByCategory = filteredCategories.reduce((acc, category) => {
                 {paulinePhotos.length > 0 && (() => {
                     const uniqueId = Math.random().toString(36).substring(7);
                     return (
-                        <div data-category="Pauline" class="flex items-center gap-2 group w-full max-w-3xl sm:max-w-4xl md:max-w-5xl justify-center" style="opacity: 0;">
+                        <div data-category="Pauline" class="md:flex hidden items-center gap-2 group w-full max-w-3xl sm:max-w-4xl md:max-w-5xl justify-center" style="opacity: 0;">
                             <a 
                                 href="/category/Pauline"
                                 class="
