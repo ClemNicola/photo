@@ -7,6 +7,9 @@ export interface Prop {
 }
 
 const {title, color} = Astro.props
+const description = 'Clement Nicolas Photography'
+const ogImage = new URL('/og-image.png', Astro.site)
+const pageUrl = new URL(Astro.url.pathname, Astro.site)
 ---
 <!doctype html>
 <html lang="en">
@@ -20,6 +23,19 @@ const {title, color} = Astro.props
 		<link rel="preload" href="/fonts/Yarndings20-Regular.ttf" as="font" type="font/ttf" crossorigin />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Clement Nicolas Photography" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={pageUrl} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
 		<ClientRouter/>
 	</head>
   <body class={`${color} overflow-x-hidden`}>
